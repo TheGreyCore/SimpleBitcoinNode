@@ -1,19 +1,16 @@
-package org.students.simplebitcoinwallet.entities;
+package org.students.simplebitcoinwallet.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.students.simplebitcoinwallet.util.Encoding;
+import org.students.simplebitcoinwallet.entity.validation.annotations.TransactionHashConstraint;
 
 import java.io.*;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.logging.Logger;
 
 @Entity
 @NoArgsConstructor

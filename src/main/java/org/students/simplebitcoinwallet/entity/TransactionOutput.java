@@ -1,4 +1,4 @@
-package org.students.simplebitcoinwallet.entities;
+package org.students.simplebitcoinwallet.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
