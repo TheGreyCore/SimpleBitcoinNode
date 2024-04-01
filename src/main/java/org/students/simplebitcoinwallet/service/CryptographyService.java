@@ -18,17 +18,4 @@ public interface CryptographyService {
      * @return a boolean value with either true, if signature verification was successful, or false otherwise
      */
     boolean verifyDigitalSignature(Serializable messageObject, byte[] signature, byte[] pubKey);
-
-    /**
-     * Generates a new implementation specific private key
-     * @return a byte array representing the private key
-     */
-    byte[] generatePrivateKey();
-
-    /**
-     * Derives a public key from given private key
-     * @param privateKey specifies the private key to use for public key derivation
-     * @return a byte array representing the public key
-     */
-    byte[] derivePublicKey(byte[] privateKey);
 }

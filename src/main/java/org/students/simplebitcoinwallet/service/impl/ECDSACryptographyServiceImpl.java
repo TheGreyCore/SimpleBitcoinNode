@@ -3,13 +3,14 @@ package org.students.simplebitcoinwallet.service.impl;
 import org.students.simplebitcoinwallet.entity.Transaction;
 import org.students.simplebitcoinwallet.entity.TransactionOutput;
 import org.students.simplebitcoinwallet.service.CryptographyService;
+import org.students.simplebitcoinwallet.util.Encoding;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
+import java.security.spec.*;
 import java.util.logging.Logger;
 
 public class ECDSACryptographyServiceImpl implements CryptographyService {
@@ -51,17 +52,32 @@ public class ECDSACryptographyServiceImpl implements CryptographyService {
      */
     @Override
     public boolean verifyDigitalSignature(Serializable messageObject, byte[] signature, byte[] pubKey) {
+        try {
+            Signature ecdsaVerify = Signature.getInstance("SHA256withECDSA");
+            KeyFactory kf = KeyFactory.getInstance("EC");
+            EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(pubKey);
+            PublicKey publicKey = kf.generatePublic(publicKeySpec);
+            ecdsaVerify.initVerify(publicKey);
+
+            // check if the object is Transaction
+            if (messageObject.getClass().isInstance(Transaction.class)) {
+                ecdsaVerify.update(serializeTransaction((Transaction) messageObject));
+            }
+            else {
+                ecdsaVerify.update(serializeObject(messageObject));
+            }
+            return ecdsaVerify.verify(signature);
+        }
+        catch (NoSuchAlgorithmException e) {
+            logger.severe("Could not create new Signature instance with SHA256withECDSA: " + e.getMessage());
+        }
+        catch (IOException e) {
+            logger.severe("Object serialization failed: ");
+        }
+        catch (GeneralSecurityException e) {
+            logger.severe("Signature check failed: : " + e.getMessage());
+        }
         return false;
-    }
-
-    @Override
-    public byte[] generatePrivateKey() {
-        return new byte[0];
-    }
-
-    @Override
-    public byte[] derivePublicKey(byte[] privateKey) {
-        return new byte[0];
     }
 
     /**
@@ -124,5 +140,35 @@ public class ECDSACryptographyServiceImpl implements CryptographyService {
             out.flush();
             return byteArrayOutputStream.toByteArray();
         }
+    }
+
+    /**
+     * Quick smoke test
+     */
+    public static void main(String[] args) throws Exception {
+        Security.insertProviderAt(new org.bouncycastle.jce.provider.BouncyCastleProvider(), 1);
+        final String msg = "Hello world!";
+        ECDSACryptographyServiceImpl service = new ECDSACryptographyServiceImpl();
+
+        // generate new keypair to use
+        ECGenParameterSpec ecSpec = new ECGenParameterSpec("secp256k1");
+        KeyPairGenerator generator = KeyPairGenerator.getInstance("EC");
+        generator.initialize(ecSpec, new SecureRandom());
+        KeyPair keypair = generator.generateKeyPair();
+        PublicKey pubKey = keypair.getPublic();
+        PrivateKey privKey = keypair.getPrivate();
+
+        // sign the message
+        Signature ecdsaSign = Signature.getInstance("SHA256withECDSA");
+        ecdsaSign.initSign(privKey);
+        ecdsaSign.update(service.serializeObject(msg));
+        byte[] signature = ecdsaSign.sign();
+        System.out.println("Message: " + msg);
+        System.out.println("Signature: " + Encoding.toHexString(signature));
+        System.out.println("Public key: " + Encoding.toHexString(pubKey.getEncoded()));
+        System.out.println("Public key length: " + pubKey.getEncoded().length);
+
+        // check if signature verification works
+        System.out.println("Signature status: " + (service.verifyDigitalSignature(msg, signature, pubKey.getEncoded())));
     }
 }

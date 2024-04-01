@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.students.simplebitcoinwallet.entity.validation.annotations.CryptographicSignatureConstraint;
+import org.students.simplebitcoinwallet.entity.validation.annotations.DoubleSpendingConstraint;
 import org.students.simplebitcoinwallet.entity.validation.annotations.TransactionHashConstraint;
 
 import java.io.*;
@@ -15,6 +17,9 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @Table(name = "ledger")
+@TransactionHashConstraint
+@DoubleSpendingConstraint
+@CryptographicSignatureConstraint
 public class Transaction implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
