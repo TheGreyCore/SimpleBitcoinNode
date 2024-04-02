@@ -3,8 +3,8 @@ package org.students.simplebitcoinwallet.exceptions.encoding;
 /**
  * Base exception class to use exceptions that indicate issues with data encoding
  */
-public class EncodingException extends Exception {
-    public EncodingException(String msg) {
+public class InvalidEncodedStringException extends Exception {
+    public InvalidEncodedStringException(String msg) {
         super(msg);
     }
 }

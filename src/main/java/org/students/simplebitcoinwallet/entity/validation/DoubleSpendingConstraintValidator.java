@@ -14,6 +14,7 @@ import java.util.logging.Logger;
  * Verifies if: <br>
  *  a) transaction inputs exist and thus are valid<br>
  *  b) transaction inputs haven't been spent before<br>
+ *  c) There are maximum of 2 transaction outputs made by given transaction
  */
 public class DoubleSpendingConstraintValidator implements ConstraintValidator<DoubleSpendingConstraint, Transaction> {
     @Autowired
@@ -27,6 +28,10 @@ public class DoubleSpendingConstraintValidator implements ConstraintValidator<Do
 
     @Override
     public boolean isValid(Transaction transaction, ConstraintValidatorContext context) {
+        // check if there are more than two transaction outputs
+        if (transaction.getOutputs().size() > 2)
+            return false;
+
         // for each input check if it is a valid
         for (TransactionOutput utxoCandidate : transaction.getInputs()) {
             if (transactionOutputRepository.findUtxoCountBySignature(utxoCandidate.getSignature()) != 1) {

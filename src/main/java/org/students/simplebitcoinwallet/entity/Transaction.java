@@ -2,9 +2,7 @@ package org.students.simplebitcoinwallet.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.students.simplebitcoinwallet.entity.validation.annotations.CryptographicSignatureConstraint;
 import org.students.simplebitcoinwallet.entity.validation.annotations.DoubleSpendingConstraint;
 import org.students.simplebitcoinwallet.entity.validation.annotations.TransactionHashConstraint;
@@ -16,6 +14,8 @@ import java.util.List;
 
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "ledger")
 @TransactionHashConstraint
 @DoubleSpendingConstraint
@@ -49,7 +49,7 @@ public class Transaction implements Serializable {
 
     @Getter
     @Setter
-    @Column(length = 130)
+    @Column(length = 177)
     @NotNull(message = "Sender public key must be present in the transaction")
     private String senderPublicKey;
 

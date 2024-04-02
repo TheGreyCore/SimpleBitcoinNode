@@ -5,15 +5,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "transaction_output")
 public class TransactionOutput implements Serializable {
     @Id
@@ -22,8 +22,7 @@ public class TransactionOutput implements Serializable {
 
     @Getter
     @Setter
-    @Column(length = 128)
-    @NotNull
+    @Column(length = 143)
     private String signature;
 
     @Getter
@@ -32,5 +31,7 @@ public class TransactionOutput implements Serializable {
 
     @Getter
     @Setter
+    @Column(length = 177)
+    @NotNull(message = "Transaction output must specify receiver's public key and it cannot be left empty")
     private String receiverPublicKey;
 }
