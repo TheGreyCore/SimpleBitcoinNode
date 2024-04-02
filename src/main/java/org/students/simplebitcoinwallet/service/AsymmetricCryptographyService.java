@@ -1,7 +1,5 @@
 package org.students.simplebitcoinwallet.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
 import org.students.simplebitcoinwallet.entity.Transaction;
 import org.students.simplebitcoinwallet.entity.TransactionOutput;
 import org.students.simplebitcoinwallet.exceptions.crypto.MalformedKeyException;
