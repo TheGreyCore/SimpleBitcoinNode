@@ -3,15 +3,11 @@ package org.students.simplebitcoinwallet.unit;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.students.simplebitcoinwallet.entity.Transaction;
-import org.students.simplebitcoinwallet.entity.TransactionOutput;
 import org.students.simplebitcoinwallet.service.AsymmetricCryptographyService;
 import org.students.simplebitcoinwallet.unit.transaction.TestTransactionBuilder;
 import org.students.simplebitcoinwallet.util.Encoding;
 
-import java.math.BigDecimal;
 import java.security.KeyPair;
-import java.time.LocalDateTime;
-import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 

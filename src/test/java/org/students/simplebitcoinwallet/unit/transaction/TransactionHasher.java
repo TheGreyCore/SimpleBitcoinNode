@@ -1,6 +1,5 @@
 package org.students.simplebitcoinwallet.unit.transaction;
 
-import org.students.simplebitcoinwallet.entity.Transaction;
 import org.students.simplebitcoinwallet.entity.TransactionOutput;
 
 import java.io.ByteArrayOutputStream;
@@ -45,9 +44,8 @@ public abstract class TransactionHasher {
     }
 
     /**
-     * Hashes Transaction object according to implementation specific hashing algorithm
+     * Hashes Transaction object contained in TransactionContainer according to implementation specific hashing algorithm
      * @param transaction specifies the Transaction object to use for hashing
-     * @return byte array containing the hash of the serialized Transaction object
      */
     public abstract void hashTransaction(TransactionContainer transaction) throws Exception;
 }

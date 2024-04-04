@@ -7,19 +7,13 @@ import lombok.Setter;
 import org.students.simplebitcoinwallet.entity.Transaction;
 import org.students.simplebitcoinwallet.util.Encoding;
 
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransactionContainer {
-    @Getter
-    @Setter
     private String name;
-
-    @Getter
-    @Setter
     private Transaction transaction;
-
-    @Getter
-    @Setter
     private byte[] hash;
 
     @Override

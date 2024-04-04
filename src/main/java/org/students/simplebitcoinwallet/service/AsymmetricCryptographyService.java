@@ -5,11 +5,9 @@ import org.students.simplebitcoinwallet.entity.TransactionOutput;
 import org.students.simplebitcoinwallet.exceptions.crypto.MalformedKeyException;
 import org.students.simplebitcoinwallet.exceptions.crypto.MalformedSignatureException;
 import org.students.simplebitcoinwallet.exceptions.encoding.SerializationException;
-import org.students.simplebitcoinwallet.util.Encoding;
 
 import java.io.*;
 import java.security.KeyPair;
-import java.security.MessageDigest;
 import java.util.logging.Logger;
 
 /**
@@ -140,31 +138,5 @@ public abstract class AsymmetricCryptographyService {
 
     protected final Logger getLogger() {
         return logger;
-    }
-
-    /**
-     * Generate hashes for string hashing testing
-     */
-    public static void main(String[] args) throws Exception {
-        // array of strings whose hashes to use
-        final String[] msgs = {
-            "Hello world!",
-            "hello world!",
-            "Yoooooo!",
-            "Hash me pls"
-        };
-
-        // sha256
-        for (String msg : msgs) {
-            try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream)) {
-                objectOutputStream.writeObject(msg);
-                objectOutputStream.flush();
-                byte[] bytes = byteArrayOutputStream.toByteArray();
-
-                MessageDigest digest = MessageDigest.getInstance("SHA-256");
-                System.out.println("'" + msg + "\': " + Encoding.toHexString(digest.digest(bytes)) + " (SHA-256)");
-            }
-        }
     }
 }
