@@ -69,7 +69,7 @@ public class TransactionValidationTests {
     /* CryptographicSignatureConstraint violations */
     @Test
     @DisplayName("Ensure that validation error is given when signature is null")
-    public void testInvalidTransaction_NullSignature_ExpectCryptographicSignatureValidationError() throws Exception {
+    public void testInvalidTransaction_NullSignature_ExpectCryptographicSignatureValidationError()  {
         // create a test transaction object
         Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys("1".repeat(176), "0".repeat(176));
         transaction.setTransactionHash("0".repeat(32));
@@ -103,12 +103,10 @@ public class TransactionValidationTests {
 
     @Test
     @DisplayName("Ensure that exceptions are handled when malformed signature format is given")
-    public void testInvalidTransaction_MalformedSignature_ExpectNoExceptionsAndCryptographicSignatureValidationError() throws Exception {
+    public void testInvalidTransaction_MalformedSignature_ExpectNoExceptionsAndCryptographicSignatureValidationError() {
         // create a test transaction object
         Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys("1".repeat(176), "0".repeat(176));
         transaction.setTransactionHash("0".repeat(32));
-
-        final byte[] senderPubKey = Encoding.hexStringToBytes("1".repeat(176));
 
         // set malformed signatures to transaction outputs
         for (TransactionOutput output : transaction.getOutputs()) {
@@ -127,7 +125,7 @@ public class TransactionValidationTests {
     /* DoubleSpendingConstraint violations */
     @Test
     @DisplayName("Ensure that reusing already used Transaction output as new Transaction's input gives DoubleSpendingConstraint error")
-    public void testInvalidTransaction_DoubleSpending_ExpectDoubleSpendingConstraintError() throws Exception {
+    public void testInvalidTransaction_DoubleSpending_ExpectDoubleSpendingConstraintError() {
         Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys("1".repeat(176), "0".repeat(176));
         transaction.setTransactionHash("0".repeat(32));
 
@@ -166,7 +164,7 @@ public class TransactionValidationTests {
 
     @Test
     @DisplayName("Ensure that TransactionHashConstraint error is given and no exceptions thrown when specified transaction hash is null")
-    public void testInvalidTransaction_NullHash_ExpectTransactionHashConstraintErrorDoesNotThrow() throws Exception {
+    public void testInvalidTransaction_NullHash_ExpectTransactionHashConstraintErrorDoesNotThrow() {
         Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys("1".repeat(176), "0".repeat(176));
 
         // set random signatures
