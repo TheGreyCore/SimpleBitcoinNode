@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 public class CryptographicSignatureConstraintValidator implements ConstraintValidator<CryptographicSignatureConstraint, Transaction> {
     @Autowired
     private AsymmetricCryptographyService asymmetricCryptographyService;
-    private Logger logger = Logger.getLogger(CryptographicSignatureConstraintValidator.class.getName());
+    private final Logger logger = Logger.getLogger(CryptographicSignatureConstraintValidator.class.getName());
 
     @Override
     public void initialize(CryptographicSignatureConstraint constraintAnnotation) {

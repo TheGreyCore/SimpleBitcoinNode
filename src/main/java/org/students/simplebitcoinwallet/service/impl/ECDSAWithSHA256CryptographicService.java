@@ -2,8 +2,6 @@ package org.students.simplebitcoinwallet.service.impl;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.students.simplebitcoinwallet.entity.Transaction;
-import org.students.simplebitcoinwallet.entity.TransactionOutput;
 import org.students.simplebitcoinwallet.exceptions.crypto.CryptoProviderNotFoundException;
 import org.students.simplebitcoinwallet.exceptions.crypto.MalformedKeyException;
 import org.students.simplebitcoinwallet.exceptions.crypto.MalformedSignatureException;
@@ -20,8 +18,8 @@ import java.security.spec.*;
 @Service
 @Qualifier("asymmetricCryptographyService")
 public class ECDSAWithSHA256CryptographicService extends AsymmetricCryptographyServiceSHA256 {
-    private ECGenParameterSpec ecSpec;
-    private KeyPairGenerator generator;
+    private final ECGenParameterSpec ecSpec;
+    private final KeyPairGenerator generator;
 
     public ECDSAWithSHA256CryptographicService() {
         super(ECDSAWithSHA256CryptographicService.class.getName());

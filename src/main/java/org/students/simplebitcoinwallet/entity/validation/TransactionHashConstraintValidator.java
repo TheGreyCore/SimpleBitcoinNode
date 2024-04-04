@@ -4,17 +4,11 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.students.simplebitcoinwallet.entity.Transaction;
-import org.students.simplebitcoinwallet.entity.TransactionOutput;
 import org.students.simplebitcoinwallet.entity.validation.annotations.TransactionHashConstraint;
 import org.students.simplebitcoinwallet.exceptions.encoding.SerializationException;
 import org.students.simplebitcoinwallet.service.AsymmetricCryptographyService;
 import org.students.simplebitcoinwallet.util.Encoding;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.logging.Logger;
 
 /**
@@ -41,7 +35,7 @@ import java.util.logging.Logger;
  * </ul>
  */
 public class TransactionHashConstraintValidator implements ConstraintValidator<TransactionHashConstraint, Transaction> {
-    private Logger logger = Logger.getLogger(TransactionHashConstraintValidator.class.getName());
+    private final Logger logger = Logger.getLogger(TransactionHashConstraintValidator.class.getName());
 
     @Autowired
     private AsymmetricCryptographyService asymmetricCryptographyService;

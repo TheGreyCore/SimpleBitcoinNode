@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 public class DoubleSpendingConstraintValidator implements ConstraintValidator<DoubleSpendingConstraint, Transaction> {
     @Autowired
     private TransactionOutputRepository transactionOutputRepository;
-    private Logger logger = Logger.getLogger(DoubleSpendingConstraintValidator.class.getName());
+    private final Logger logger = Logger.getLogger(DoubleSpendingConstraintValidator.class.getName());
 
     @Override
     public void initialize(DoubleSpendingConstraint constraintAnnotation) {
@@ -42,10 +42,6 @@ public class DoubleSpendingConstraintValidator implements ConstraintValidator<Do
             return false;
 
         // check that each transaction output is unique
-        if (transaction.getOutputs().size() > 1 && transaction.getOutputs().get(0).getReceiverPublicKey().equals(transaction.getOutputs().get(1).getReceiverPublicKey())) {
-            return false;
-        }
-
-        return true;
+        return transaction.getOutputs().size() <= 1 || !transaction.getOutputs().get(0).getReceiverPublicKey().equals(transaction.getOutputs().get(1).getReceiverPublicKey());
     }
 }
