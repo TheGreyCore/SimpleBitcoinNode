@@ -6,7 +6,10 @@ import org.students.simplebitcoinwallet.exceptions.crypto.MalformedKeyException;
 import org.students.simplebitcoinwallet.exceptions.crypto.MalformedSignatureException;
 import org.students.simplebitcoinwallet.exceptions.encoding.SerializationException;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.security.KeyPair;
 import java.util.logging.Logger;
 

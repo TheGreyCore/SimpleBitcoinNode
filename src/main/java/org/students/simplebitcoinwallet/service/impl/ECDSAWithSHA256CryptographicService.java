@@ -50,7 +50,7 @@ public class ECDSAWithSHA256CryptographicService extends AsymmetricCryptographyS
             EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(pubKey);
             PublicKey publicKey = kf.generatePublic(publicKeySpec);
             ecdsaVerify.initVerify(publicKey);
-            ecdsaVerify.update(digestObject(messageObject));
+            ecdsaVerify.update(byteSerialize(messageObject));
             return ecdsaVerify.verify(signature);
         }
         catch (NoSuchAlgorithmException e) {

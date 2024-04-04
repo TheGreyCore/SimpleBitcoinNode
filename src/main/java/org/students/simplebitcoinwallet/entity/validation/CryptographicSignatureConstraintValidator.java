@@ -3,7 +3,6 @@ package org.students.simplebitcoinwallet.entity.validation;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.bouncycastle.util.Arrays;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.students.simplebitcoinwallet.entity.Transaction;
 import org.students.simplebitcoinwallet.entity.TransactionOutput;
 import org.students.simplebitcoinwallet.entity.validation.annotations.CryptographicSignatureConstraint;
@@ -22,9 +21,12 @@ import java.util.logging.Logger;
  *   [HASH] + [RECEIVER_PUBKEY]<br>
  */
 public class CryptographicSignatureConstraintValidator implements ConstraintValidator<CryptographicSignatureConstraint, Transaction> {
-    @Autowired
-    private AsymmetricCryptographyService asymmetricCryptographyService;
+    private final AsymmetricCryptographyService asymmetricCryptographyService;
     private final Logger logger = Logger.getLogger(CryptographicSignatureConstraintValidator.class.getName());
+
+    public CryptographicSignatureConstraintValidator(AsymmetricCryptographyService asymmetricCryptographyService) {
+        this.asymmetricCryptographyService = asymmetricCryptographyService;
+    }
 
     @Override
     public void initialize(CryptographicSignatureConstraint constraintAnnotation) {
@@ -36,6 +38,10 @@ public class CryptographicSignatureConstraintValidator implements ConstraintVali
         // for each transaction output verify its signature
         try {
             for (TransactionOutput transactionOutput : transaction.getOutputs()) {
+                // null signatures get invalidated
+                if (transactionOutput.getSignature() == null)
+                    return false;
+
                 // concatenate the transaction hash and output's receiver public key to get signature message
                 byte[] sigMessage = Arrays.concatenate(asymmetricCryptographyService.digestObject(transaction), Encoding.hexStringToBytes(transactionOutput.getReceiverPublicKey()));
                 if (!asymmetricCryptographyService.verifyDigitalSignature(sigMessage, Encoding.hexStringToBytes(transactionOutput.getSignature()), Encoding.defaultPubKeyDecoding(transaction.getSenderPublicKey())))
