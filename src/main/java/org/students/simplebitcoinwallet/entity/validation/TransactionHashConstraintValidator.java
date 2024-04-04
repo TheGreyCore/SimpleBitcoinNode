@@ -2,9 +2,12 @@ package org.students.simplebitcoinwallet.entity.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.students.simplebitcoinwallet.entity.Transaction;
 import org.students.simplebitcoinwallet.entity.TransactionOutput;
 import org.students.simplebitcoinwallet.entity.validation.annotations.TransactionHashConstraint;
+import org.students.simplebitcoinwallet.exceptions.encoding.SerializationException;
+import org.students.simplebitcoinwallet.service.AsymmetricCryptographyService;
 import org.students.simplebitcoinwallet.util.Encoding;
 
 import java.io.ByteArrayOutputStream;
@@ -40,44 +43,8 @@ import java.util.logging.Logger;
 public class TransactionHashConstraintValidator implements ConstraintValidator<TransactionHashConstraint, Transaction> {
     private Logger logger = Logger.getLogger(TransactionHashConstraintValidator.class.getName());
 
-    private byte[] serializeToByteArray(Transaction transaction) {
-        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-             ObjectOutputStream out = new ObjectOutputStream(byteArrayOutputStream))
-        {
-            out.writeObject(transaction.getInputs().size());
-            for (TransactionOutput output : transaction.getInputs()) {
-                out.writeObject(output.getSignature());
-                out.writeObject(output.getAmount());
-                out.writeObject(output.getReceiverPublicKey());
-            }
-            out.writeObject(transaction.getOutputs().size());
-            for (TransactionOutput output : transaction.getOutputs()) {
-                out.writeObject(output.getAmount());
-                out.writeObject(output.getReceiverPublicKey());
-            }
-            out.writeObject(transaction.getSenderPublicKey());
-            out.writeObject(transaction.getTimestamp());
-            out.flush();
-            return byteArrayOutputStream.toByteArray();
-        }
-        catch (IOException e) {
-            logger.severe("Failed to serialize transaction, as a result the hash verification will fail: " + e.getMessage());
-        }
-
-        return new byte[]{};
-    }
-
-    private String calculateSHA256Hash(Transaction transaction) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] digestBytes = digest.digest(serializeToByteArray(transaction));
-            return Encoding.toHexString(digestBytes);
-        }
-        catch (NoSuchAlgorithmException e) {
-            logger.severe("Current MessageDigest implementation does not support 'SHA-256' hashing: " + e.getMessage());
-            return "0".repeat(64);
-        }
-    }
+    @Autowired
+    private AsymmetricCryptographyService asymmetricCryptographyService;
 
     @Override
     public void initialize(TransactionHashConstraint constraintAnnotation) {
@@ -86,6 +53,12 @@ public class TransactionHashConstraintValidator implements ConstraintValidator<T
 
     @Override
     public boolean isValid(Transaction transaction, ConstraintValidatorContext constraintValidatorContext) {
-        return transaction.getTransactionHash().equals(calculateSHA256Hash(transaction));
+        try {
+            return transaction.getTransactionHash().equals(Encoding.toHexString(asymmetricCryptographyService.digestObject(transaction)));
+        }
+        catch (SerializationException e) {
+            logger.warning("Could not serialize transaction object: " + e.getMessage());
+            return false;
+        }
     }
 }

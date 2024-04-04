@@ -2,6 +2,8 @@ package org.students.simplebitcoinwallet.service.impl;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.students.simplebitcoinwallet.entity.Transaction;
+import org.students.simplebitcoinwallet.entity.TransactionOutput;
 import org.students.simplebitcoinwallet.exceptions.crypto.CryptoProviderNotFoundException;
 import org.students.simplebitcoinwallet.exceptions.crypto.MalformedKeyException;
 import org.students.simplebitcoinwallet.exceptions.crypto.MalformedSignatureException;
@@ -50,7 +52,7 @@ public class ECDSAWithSHA256CryptographicService extends AsymmetricCryptographyS
             EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(pubKey);
             PublicKey publicKey = kf.generatePublic(publicKeySpec);
             ecdsaVerify.initVerify(publicKey);
-            ecdsaVerify.update(byteSerialize(messageObject));
+            ecdsaVerify.update(digestObject(messageObject));
             return ecdsaVerify.verify(signature);
         }
         catch (NoSuchAlgorithmException e) {
