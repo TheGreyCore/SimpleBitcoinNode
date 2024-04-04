@@ -1,11 +1,30 @@
 package org.students.simplebitcoinwallet.util;
 
-import org.students.simplebitcoinwallet.exceptions.encoding.InvalidHexStringException;
+import org.students.simplebitcoinwallet.exceptions.encoding.InvalidEncodedStringException;
 
 /**
- * Metaclass for encoding related code
+ * Encoding utility class
  */
 public class Encoding {
+    /**
+     * Encodes the public key with current default public key encoding
+     * @param pubKey represents the public key as byte array to encode
+     * @return string value containing the encoded public key
+     */
+    public static String defaultPubKeyEncoding(byte[] pubKey) {
+        return toHexString(pubKey);
+    }
+
+    /**
+     * Decodes the provided public key with current default public key decoding algorithm
+     * @param encodedPublicKey represents the encoded public key as string
+     * @return byte array representing the public key
+     * @throws InvalidEncodedStringException
+     */
+    public static byte[] defaultPubKeyDecoding(String encodedPublicKey) throws InvalidEncodedStringException {
+        return hexStringToBytes(encodedPublicKey);
+    }
+
     /**
      * Converts the byte array into hexadecimal string
      * @param bytes represents the array of bytes to use for encoding
@@ -29,9 +48,9 @@ public class Encoding {
      * @param hexString specifies the hexadecimal string to decode. The string is assumed to only contain lowercase numerical or lowercase `abcdef` characters.
      *                  Other-wise the method call will fail with InvalidHexStringException.
      * @return array of decoded bytes
-     * @throws InvalidHexStringException when the
+     * @throws InvalidEncodedStringException when the
      */
-    public static byte[] hexStringToBytes(String hexString) throws InvalidHexStringException {
+    public static byte[] hexStringToBytes(String hexString) throws InvalidEncodedStringException {
         validateHexStringOrException(hexString);
         byte[] bytes = new byte[hexString.length() / 2];
 
@@ -43,15 +62,15 @@ public class Encoding {
         return bytes;
     }
 
-    private static void validateHexStringOrException(String hexString) throws InvalidHexStringException {
+    private static void validateHexStringOrException(String hexString) throws InvalidEncodedStringException {
         // length must be multiple of 2 requirement
         if (hexString.length() % 2 != 0)
-            throw new InvalidHexStringException("HexString length must be multiple of 2");
+            throw new InvalidEncodedStringException("HexString length must be multiple of 2");
 
         // allowed symbol requirements
         for (char c : hexString.toCharArray()) {
             if (c < '0' || (c > '9' && c < 'a') || c > 'z')
-                throw new InvalidHexStringException("Invalid symbol '" + c + "' in hexString ");
+                throw new InvalidEncodedStringException("Invalid symbol '" + c + "' in hexString ");
         }
     }
 
