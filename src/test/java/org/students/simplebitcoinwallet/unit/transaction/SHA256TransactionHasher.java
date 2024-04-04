@@ -1,7 +1,6 @@
 package org.students.simplebitcoinwallet.unit.transaction;
 
 import java.security.MessageDigest;
-import java.util.List;
 
 /**
  * Calculate SHA-256 hashes from Transaction objects
