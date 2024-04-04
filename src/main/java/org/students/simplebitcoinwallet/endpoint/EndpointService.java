@@ -12,8 +12,8 @@ public class EndpointService {
     }
 
     /**
-     * Method to check status of application.
-     * @return Math with status of application
+     * Method to check status of application. ATM do not show real status.
+     * @return Map with status of application
      */
     public Map<String, String> getStatus() {
         Map<String, String> response = new HashMap<>();
@@ -23,4 +23,3 @@ public class EndpointService {
         return response;
     }
 }
-
