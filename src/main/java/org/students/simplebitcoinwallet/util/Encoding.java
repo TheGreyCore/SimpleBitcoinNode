@@ -2,10 +2,14 @@ package org.students.simplebitcoinwallet.util;
 
 import org.students.simplebitcoinwallet.exceptions.encoding.InvalidEncodedStringException;
 
+import java.math.BigInteger;
+
 /**
  * Encoding utility class
  */
 public class Encoding {
+    private static final String base58Charset = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
     /**
      * Encodes the public key with current default public key encoding
      * @param pubKey represents the public key as byte array to encode
@@ -48,7 +52,7 @@ public class Encoding {
      * @param hexString specifies the hexadecimal string to decode. The string is assumed to only contain lowercase numerical or lowercase `abcdef` characters.
      *                  Other-wise the method call will fail with InvalidHexStringException.
      * @return array of decoded bytes
-     * @throws InvalidEncodedStringException when the
+     * @throws InvalidEncodedStringException
      */
     public static byte[] hexStringToBytes(String hexString) throws InvalidEncodedStringException {
         validateHexStringOrException(hexString);
@@ -60,6 +64,74 @@ public class Encoding {
         }
 
         return bytes;
+    }
+
+    /**
+     * Encodes a byte array as base58 string
+     * @param bytes represents the byte array to encode
+     * @return string containing base58 representation of the data
+     */
+    public static String base58Encode(byte[] bytes) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        // convert bytes to BigInteger
+        BigInteger val = new BigInteger(bytes);
+
+        while (val.compareTo(new BigInteger("0")) > 0) {
+            stringBuilder.append(base58Charset.charAt(val.mod(new BigInteger("58")).intValue()));
+            val = val.divide(new BigInteger("58"));
+        }
+
+        // BigInteger uses big endian encoding for byte arrays, that's why reversing is required
+        return stringBuilder.reverse().toString();
+    }
+
+    /**
+     * Decodes base58 encoded string into a byte array
+     * @param string specifies base58 encoded string to decode
+     * @return byte array containing decoded data
+     * @throws InvalidEncodedStringException
+     */
+    public static byte[] base58Decode(String string) throws InvalidEncodedStringException {
+        StringBuilder builder = new StringBuilder(string);
+        BigInteger val = new BigInteger("0");
+
+        // convert characters to BigInteger
+        BigInteger exp = new BigInteger("1");
+        for (char c : builder.reverse().toString().toCharArray()) {
+            int index = binarySearchBase58AlphabetIndex(c);
+            val = val.add(exp.multiply(new BigInteger("" + index)));
+            exp = exp.multiply(new BigInteger("58"));
+        }
+
+        return val.toByteArray();
+    }
+
+    public static void main(String[] args) throws InvalidEncodedStringException {
+        String msg = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
+        String encoded = base58Encode(msg.getBytes());
+        System.out.println(encoded);
+        System.out.println(new String(base58Decode(encoded)));
+    }
+
+    private static int binarySearchBase58AlphabetIndex(char c) throws InvalidEncodedStringException {
+        // find character's index using binary search
+        int left = 0; // inclusive
+        int right = base58Charset.length(); // exclusive
+        int mid = (left + right) / 2;
+
+        while (base58Charset.charAt(mid) != c) {
+            if (right - left <= 1)
+                throw new InvalidEncodedStringException("Base58 decoding failed: character '" + c + "' is not in Base58 alphabet");
+
+            if (base58Charset.charAt(mid) > c)
+                right = mid;
+            else if (base58Charset.charAt(mid) < c)
+                left = mid;
+            mid = (left + right) / 2;
+        }
+
+        return mid;
     }
 
     private static void validateHexStringOrException(String hexString) throws InvalidEncodedStringException {
