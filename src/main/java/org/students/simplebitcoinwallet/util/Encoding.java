@@ -110,18 +110,18 @@ public class Encoding {
         }
 
         // ugly baseness conversion algorithm all over again
-        for (int i = 0; i < base58AsBytes.length; i++) {
-            int carry = base58AsBytes[i];
+        for (int base58AsByte : base58AsBytes) {
+            int carry = base58AsByte;
             for (int j = 0; j < byteList.size(); j++) {
                 // evil bit manipulations (⊙_⊙)
                 carry += (byteList.get(j) & 0xff) * 58;
-                byteList.set(j, (byte)(carry & 0xff));
+                byteList.set(j, (byte) (carry & 0xff));
                 carry >>= 8;
             }
 
             // decompose carry bits into bytes
             while (carry > 0) {
-                byteList.add((byte)(carry & 0xff));
+                byteList.add((byte) (carry & 0xff));
                 carry >>= 8;
             }
         }
