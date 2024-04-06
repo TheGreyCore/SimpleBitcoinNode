@@ -1,4 +1,4 @@
-package org.students.simplebitcoinwallet.endpoint;
+package org.students.simplebitcoinwallet.service;
 
 
 import org.springframework.stereotype.Service;
