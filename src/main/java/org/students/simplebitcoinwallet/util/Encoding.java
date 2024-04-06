@@ -2,7 +2,10 @@ package org.students.simplebitcoinwallet.util;
 
 import org.students.simplebitcoinwallet.exceptions.encoding.InvalidEncodedStringException;
 
-import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Encoding utility class
@@ -74,15 +77,20 @@ public class Encoding {
     public static String base58Encode(byte[] bytes) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        // convert bytes to BigInteger
-        BigInteger val = new BigInteger(bytes);
+        byte[] copy = Arrays.copyOf(bytes, bytes.length);
+        for (int i = 0; i < copy.length;) {
+            int carry = 0;
+            for (int j = 0; j < copy.length; j++) {
+                int digit = (copy[j] & 0xff) + (carry << 8);
+                copy[j] = (byte) (digit / 58);
+                carry = digit % 58;
+            }
 
-        while (val.compareTo(new BigInteger("0")) > 0) {
-            stringBuilder.append(base58Charset.charAt(val.mod(new BigInteger("58")).intValue()));
-            val = val.divide(new BigInteger("58"));
+            if (copy[i] == 0)
+                i++;
+            stringBuilder.append(base58Charset.charAt(carry));
         }
 
-        // BigInteger uses big endian encoding for byte arrays, that's why reversing is required
         return stringBuilder.reverse().toString();
     }
 
@@ -93,23 +101,46 @@ public class Encoding {
      * @throws InvalidEncodedStringException
      */
     public static byte[] base58Decode(String string) throws InvalidEncodedStringException {
-        StringBuilder builder = new StringBuilder(string);
-        BigInteger val = new BigInteger("0");
+        List<Byte> byteList = new ArrayList<>();
 
-        // convert characters to BigInteger
-        BigInteger exp = new BigInteger("1");
-        for (char c : builder.reverse().toString().toCharArray()) {
-            int index = binarySearchBase58AlphabetIndex(c);
-            val = val.add(exp.multiply(new BigInteger("" + index)));
-            exp = exp.multiply(new BigInteger("58"));
+        // represent base58 integer as byte array and count leading zeroes
+        byte[] base58AsBytes = new byte[string.length()];
+        for (int i = 0; i < string.length(); i++) {
+            base58AsBytes[i] = (byte) binarySearchBase58AlphabetIndex(string.charAt(i));
         }
 
-        return val.toByteArray();
+        // ugly baseness conversion algorithm all over again
+        for (int i = 0; i < base58AsBytes.length; i++) {
+            int carry = base58AsBytes[i];
+            for (int j = 0; j < byteList.size(); j++) {
+                // evil bit manipulations (⊙_⊙)
+                carry += (byteList.get(j) & 0xff) * 58;
+                byteList.set(j, (byte)(carry & 0xff));
+                carry >>= 8;
+            }
+
+            // decompose carry bits into bytes
+            while (carry > 0) {
+                byteList.add((byte)(carry & 0xff));
+                carry >>= 8;
+            }
+        }
+
+        // deal with leading zeroes
+        for (int i = 0; i < base58AsBytes.length && base58AsBytes[i] == (byte)0; i++) {
+            byteList.add((byte)0);
+        }
+
+        // convert list to byte array
+        byte[] res = new byte[byteList.size()];
+        for (int i = 0; i < byteList.size(); i++)
+            res[i] = byteList.get(byteList.size() - 1 - i);
+        return res;
     }
 
     public static void main(String[] args) throws InvalidEncodedStringException {
-        String msg = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
-        String encoded = base58Encode(msg.getBytes());
+        String msg = "Hello world!";
+        String encoded = base58Encode(msg.getBytes(StandardCharsets.UTF_8));
         System.out.println(encoded);
         System.out.println(new String(base58Decode(encoded)));
     }
