@@ -19,7 +19,7 @@ public class Encoding {
      * @return string value containing the encoded public key
      */
     public static String defaultPubKeyEncoding(byte[] pubKey) {
-        return toHexString(pubKey);
+        return base58Encode(pubKey);
     }
 
     /**
@@ -29,7 +29,7 @@ public class Encoding {
      * @throws InvalidEncodedStringException
      */
     public static byte[] defaultPubKeyDecoding(String encodedPublicKey) throws InvalidEncodedStringException {
-        return hexStringToBytes(encodedPublicKey);
+        return base58Decode(encodedPublicKey);
     }
 
     /**
