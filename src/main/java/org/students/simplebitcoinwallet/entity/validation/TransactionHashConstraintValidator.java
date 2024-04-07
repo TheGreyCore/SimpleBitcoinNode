@@ -35,10 +35,13 @@ import java.util.logging.Logger;
  * </ul>
  */
 public class TransactionHashConstraintValidator implements ConstraintValidator<TransactionHashConstraint, Transaction> {
+    private final AsymmetricCryptographyService asymmetricCryptographyService;
     private final Logger logger = Logger.getLogger(TransactionHashConstraintValidator.class.getName());
 
     @Autowired
-    private AsymmetricCryptographyService asymmetricCryptographyService;
+    public TransactionHashConstraintValidator(AsymmetricCryptographyService asymmetricCryptographyService) {
+        this.asymmetricCryptographyService = asymmetricCryptographyService;
+    }
 
     @Override
     public void initialize(TransactionHashConstraint constraintAnnotation) {

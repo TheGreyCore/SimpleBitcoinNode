@@ -14,9 +14,13 @@ import java.util.logging.Logger;
  * Validates if Transaction inputs have not been spent before.
  */
 public class DoubleSpendingConstraintValidator implements ConstraintValidator<DoubleSpendingConstraint, Transaction> {
-    @Autowired
-    private TransactionOutputRepository transactionOutputRepository;
+    private final TransactionOutputRepository transactionOutputRepository;
     private final Logger logger = Logger.getLogger(DoubleSpendingConstraintValidator.class.getName());
+
+    @Autowired
+    public DoubleSpendingConstraintValidator(TransactionOutputRepository transactionOutputRepository) {
+        this.transactionOutputRepository = transactionOutputRepository;
+    }
 
     @Override
     public void initialize(DoubleSpendingConstraint constraintAnnotation) {

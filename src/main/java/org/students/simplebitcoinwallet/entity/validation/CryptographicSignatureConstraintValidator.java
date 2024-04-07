@@ -22,9 +22,13 @@ import java.util.logging.Logger;
  *   [HASH] + [RECEIVER_PUBKEY]<br>
  */
 public class CryptographicSignatureConstraintValidator implements ConstraintValidator<CryptographicSignatureConstraint, Transaction> {
-    @Autowired
-    private AsymmetricCryptographyService asymmetricCryptographyService;
+    private final AsymmetricCryptographyService asymmetricCryptographyService;
     private final Logger logger = Logger.getLogger(CryptographicSignatureConstraintValidator.class.getName());
+
+    @Autowired
+    public CryptographicSignatureConstraintValidator(AsymmetricCryptographyService asymmetricCryptographyService) {
+        this.asymmetricCryptographyService = asymmetricCryptographyService;
+    }
 
     @Override
     public void initialize(CryptographicSignatureConstraint constraintAnnotation) {
