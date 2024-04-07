@@ -48,22 +48,22 @@ public class TransactionValidationTests {
 
         // mock digestObject(), presumably used in TransactionHashConstraint
         given(asymmetricCryptographyService.digestObject(transaction))
-            .willReturn(Encoding.hexStringToBytes("0".repeat(32)));
+                .willReturn(Encoding.hexStringToBytes("0".repeat(32)));
         // mock verifySignature(), presumably used in CryptographicSignatureConstraint
         given(asymmetricCryptographyService.verifyDigitalSignature(any(Serializable.class), any(), any()))
-            .willReturn(true);
+                .willReturn(true);
         // mock findUtxoCountBySignature(), presumably used in DoubleSpendingConstraint
         given(transactionOutputRepository.findUtxoCountBySignature(anyString()))
-            .willReturn(0);
+                .willReturn(0);
 
         // construct validators
-        DoubleSpendingConstraintValidator doubleSpendingConstraintValidator = new DoubleSpendingConstraintValidator();
-        TransactionHashConstraintValidator transactionHashConstraintValidator = new TransactionHashConstraintValidator();
-        CryptographicSignatureConstraintValidator cryptographicSignatureConstraintValidator = new CryptographicSignatureConstraintValidator();
+        DoubleSpendingConstraintValidator doubleSpendingConstraintValidator = new DoubleSpendingConstraintValidator(transactionOutputRepository);
+        TransactionHashConstraintValidator transactionHashConstraintValidator = new TransactionHashConstraintValidator(asymmetricCryptographyService);
+        CryptographicSignatureConstraintValidator cryptographicSignatureConstraintValidator = new CryptographicSignatureConstraintValidator(asymmetricCryptographyService);
 
         assertTrue(doubleSpendingConstraintValidator.isValid(transaction, null) &&
-                    transactionHashConstraintValidator.isValid(transaction, null) &&
-                    cryptographicSignatureConstraintValidator.isValid(transaction, null));
+                transactionHashConstraintValidator.isValid(transaction, null) &&
+                cryptographicSignatureConstraintValidator.isValid(transaction, null));
     }
 
     /* CryptographicSignatureConstraint violations */
@@ -74,7 +74,7 @@ public class TransactionValidationTests {
         Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys("1".repeat(176), "0".repeat(176));
         transaction.setTransactionHash("0".repeat(32));
 
-        CryptographicSignatureConstraintValidator cryptographicSignatureConstraintValidator = new CryptographicSignatureConstraintValidator();
+        CryptographicSignatureConstraintValidator cryptographicSignatureConstraintValidator = new CryptographicSignatureConstraintValidator(asymmetricCryptographyService);
         assertFalse(cryptographicSignatureConstraintValidator.isValid(transaction, null));
     }
 
@@ -92,12 +92,12 @@ public class TransactionValidationTests {
 
         // mock digestObject(), presumably used in TransactionHashConstraint and CryptographicSignatureConstraint
         given(asymmetricCryptographyService.digestObject(transaction))
-            .willReturn(Encoding.hexStringToBytes("0".repeat(32)));
+                .willReturn(Encoding.hexStringToBytes("0".repeat(32)));
         // mock verifySignature(), presumably used in CryptographicSignatureConstraint
         given(asymmetricCryptographyService.verifyDigitalSignature(any(Serializable.class), any(), any()))
-            .willReturn(false);
+                .willReturn(false);
 
-        CryptographicSignatureConstraintValidator cryptographicSignatureConstraintValidator = new CryptographicSignatureConstraintValidator();
+        CryptographicSignatureConstraintValidator cryptographicSignatureConstraintValidator = new CryptographicSignatureConstraintValidator(asymmetricCryptographyService);
         assertFalse(cryptographicSignatureConstraintValidator.isValid(transaction, null));
     }
 
@@ -113,7 +113,7 @@ public class TransactionValidationTests {
             output.setSignature("Hello, I am an invalid signature as you can see.");
         }
 
-        CryptographicSignatureConstraintValidator cryptographicSignatureConstraintValidator = new CryptographicSignatureConstraintValidator();
+        CryptographicSignatureConstraintValidator cryptographicSignatureConstraintValidator = new CryptographicSignatureConstraintValidator(asymmetricCryptographyService);
         try {
             assertFalse(cryptographicSignatureConstraintValidator.isValid(transaction, null));
         }
@@ -136,9 +136,9 @@ public class TransactionValidationTests {
 
         // mock findUtxoCountBySignature(), presumably used in DoubleSpendingConstraint
         given(transactionOutputRepository.findUtxoCountBySignature(any()))
-            .willReturn(1);
+                .willReturn(1);
 
-        DoubleSpendingConstraintValidator doubleSpendingConstraintValidator = new DoubleSpendingConstraintValidator();
+        DoubleSpendingConstraintValidator doubleSpendingConstraintValidator = new DoubleSpendingConstraintValidator(transactionOutputRepository);
         assertFalse(doubleSpendingConstraintValidator.isValid(transaction, null));
     }
 
@@ -158,7 +158,7 @@ public class TransactionValidationTests {
         given(asymmetricCryptographyService.digestObject(transaction))
                 .willReturn(Encoding.hexStringToBytes("1".repeat(32)));
 
-        TransactionHashConstraintValidator transactionHashConstraintValidator = new TransactionHashConstraintValidator();
+        TransactionHashConstraintValidator transactionHashConstraintValidator = new TransactionHashConstraintValidator(asymmetricCryptographyService);
         assertFalse(transactionHashConstraintValidator.isValid(transaction, null));
     }
 
@@ -172,7 +172,7 @@ public class TransactionValidationTests {
             output.setSignature("0".repeat(64));
         }
 
-        TransactionHashConstraintValidator transactionHashConstraintValidator = new TransactionHashConstraintValidator();
+        TransactionHashConstraintValidator transactionHashConstraintValidator = new TransactionHashConstraintValidator(asymmetricCryptographyService);
         try {
             assertFalse(transactionHashConstraintValidator.isValid(transaction, null));
         }

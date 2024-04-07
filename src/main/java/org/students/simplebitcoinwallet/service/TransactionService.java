@@ -16,11 +16,23 @@ public class TransactionService {
         this.transactionRepository = transactionRepository;
     }
 
+    /**
+     * Retrieves a list of transactions associated with a given public key and transaction type.
+     *
+     * @param pubKey The public key associated with the transactions. This is a unique identifier for a user.
+     * @param type The type of transactions to retrieve. This can be "sent", "received", or "all".
+     *
+     * @return A list of transactions that match the given public key and transaction type.
+     *         Returns null if the transaction type does not match any of the predefined types.
+     *
+     * @throws IllegalArgumentException if the provided public key is null or empty.
+     * @throws IllegalArgumentException if the provided type is null or empty.
+     */
     public List<Transaction> getTransactions(String pubKey, String type) {
         return switch (type) {
-            case "sent" -> transactionRepository.findSentTransactionsByPublicKey(pubKey);
-            case "received" -> transactionRepository.findReceivedTransactionsByPublicKey(pubKey);
-            case "all" -> transactionRepository.findAllTransactionsByPublicKey(pubKey);
+            case "sent" -> transactionRepository.findSentTransactionsByPublicKeyAddress(pubKey);
+            case "received" -> transactionRepository.findAllReceivedTransactionsByPublicKeyAddress(pubKey);
+            case "all" -> transactionRepository.findAllTransactionsByPublicKeyAddress(pubKey);
             default -> null;
         };
     }

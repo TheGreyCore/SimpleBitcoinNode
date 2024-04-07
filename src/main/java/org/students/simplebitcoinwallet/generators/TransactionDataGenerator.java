@@ -16,14 +16,12 @@ import java.security.KeyPair;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.logging.Logger;
 
 @Component
 public class TransactionDataGenerator implements CommandLineRunner {
     // injected dependencies
     private final AsymmetricCryptographyService asymmetricCryptographyService;
     private final TransactionRepository transactionRepository;
-    private final Logger logger = Logger.getLogger(TransactionDataGenerator.class.getName());
 
     // initialized from TransactionDataGenerator.run
     private BigDecimal initialCirculation; // how many tokens should be let into circulation
