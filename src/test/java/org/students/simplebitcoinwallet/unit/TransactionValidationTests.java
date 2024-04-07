@@ -57,9 +57,9 @@ public class TransactionValidationTests {
             .willReturn(0);
 
         // construct validators
-        DoubleSpendingConstraintValidator doubleSpendingConstraintValidator = new DoubleSpendingConstraintValidator(transactionOutputRepository);
-        TransactionHashConstraintValidator transactionHashConstraintValidator = new TransactionHashConstraintValidator(asymmetricCryptographyService);
-        CryptographicSignatureConstraintValidator cryptographicSignatureConstraintValidator = new CryptographicSignatureConstraintValidator(asymmetricCryptographyService);
+        DoubleSpendingConstraintValidator doubleSpendingConstraintValidator = new DoubleSpendingConstraintValidator();
+        TransactionHashConstraintValidator transactionHashConstraintValidator = new TransactionHashConstraintValidator();
+        CryptographicSignatureConstraintValidator cryptographicSignatureConstraintValidator = new CryptographicSignatureConstraintValidator();
 
         assertTrue(doubleSpendingConstraintValidator.isValid(transaction, null) &&
                     transactionHashConstraintValidator.isValid(transaction, null) &&
@@ -74,7 +74,7 @@ public class TransactionValidationTests {
         Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys("1".repeat(176), "0".repeat(176));
         transaction.setTransactionHash("0".repeat(32));
 
-        CryptographicSignatureConstraintValidator cryptographicSignatureConstraintValidator = new CryptographicSignatureConstraintValidator(asymmetricCryptographyService);
+        CryptographicSignatureConstraintValidator cryptographicSignatureConstraintValidator = new CryptographicSignatureConstraintValidator();
         assertFalse(cryptographicSignatureConstraintValidator.isValid(transaction, null));
     }
 
@@ -97,7 +97,7 @@ public class TransactionValidationTests {
         given(asymmetricCryptographyService.verifyDigitalSignature(any(Serializable.class), any(), any()))
             .willReturn(false);
 
-        CryptographicSignatureConstraintValidator cryptographicSignatureConstraintValidator = new CryptographicSignatureConstraintValidator(asymmetricCryptographyService);
+        CryptographicSignatureConstraintValidator cryptographicSignatureConstraintValidator = new CryptographicSignatureConstraintValidator();
         assertFalse(cryptographicSignatureConstraintValidator.isValid(transaction, null));
     }
 
@@ -113,7 +113,7 @@ public class TransactionValidationTests {
             output.setSignature("Hello, I am an invalid signature as you can see.");
         }
 
-        CryptographicSignatureConstraintValidator cryptographicSignatureConstraintValidator = new CryptographicSignatureConstraintValidator(asymmetricCryptographyService);
+        CryptographicSignatureConstraintValidator cryptographicSignatureConstraintValidator = new CryptographicSignatureConstraintValidator();
         try {
             assertFalse(cryptographicSignatureConstraintValidator.isValid(transaction, null));
         }
@@ -138,7 +138,7 @@ public class TransactionValidationTests {
         given(transactionOutputRepository.findUtxoCountBySignature(any()))
             .willReturn(1);
 
-        DoubleSpendingConstraintValidator doubleSpendingConstraintValidator = new DoubleSpendingConstraintValidator(transactionOutputRepository);
+        DoubleSpendingConstraintValidator doubleSpendingConstraintValidator = new DoubleSpendingConstraintValidator();
         assertFalse(doubleSpendingConstraintValidator.isValid(transaction, null));
     }
 
@@ -158,7 +158,7 @@ public class TransactionValidationTests {
         given(asymmetricCryptographyService.digestObject(transaction))
                 .willReturn(Encoding.hexStringToBytes("1".repeat(32)));
 
-        TransactionHashConstraintValidator transactionHashConstraintValidator = new TransactionHashConstraintValidator(asymmetricCryptographyService);
+        TransactionHashConstraintValidator transactionHashConstraintValidator = new TransactionHashConstraintValidator();
         assertFalse(transactionHashConstraintValidator.isValid(transaction, null));
     }
 
@@ -172,7 +172,7 @@ public class TransactionValidationTests {
             output.setSignature("0".repeat(64));
         }
 
-        TransactionHashConstraintValidator transactionHashConstraintValidator = new TransactionHashConstraintValidator(asymmetricCryptographyService);
+        TransactionHashConstraintValidator transactionHashConstraintValidator = new TransactionHashConstraintValidator();
         try {
             assertFalse(transactionHashConstraintValidator.isValid(transaction, null));
         }
