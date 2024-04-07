@@ -3,6 +3,7 @@ package org.students.simplebitcoinwallet.entity.validation;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.bouncycastle.util.Arrays;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.students.simplebitcoinwallet.entity.Transaction;
 import org.students.simplebitcoinwallet.entity.TransactionOutput;
 import org.students.simplebitcoinwallet.entity.validation.annotations.CryptographicSignatureConstraint;
@@ -21,12 +22,9 @@ import java.util.logging.Logger;
  *   [HASH] + [RECEIVER_PUBKEY]<br>
  */
 public class CryptographicSignatureConstraintValidator implements ConstraintValidator<CryptographicSignatureConstraint, Transaction> {
-    private final AsymmetricCryptographyService asymmetricCryptographyService;
+    @Autowired
+    private AsymmetricCryptographyService asymmetricCryptographyService;
     private final Logger logger = Logger.getLogger(CryptographicSignatureConstraintValidator.class.getName());
-
-    public CryptographicSignatureConstraintValidator(AsymmetricCryptographyService asymmetricCryptographyService) {
-        this.asymmetricCryptographyService = asymmetricCryptographyService;
-    }
 
     @Override
     public void initialize(CryptographicSignatureConstraint constraintAnnotation) {
@@ -35,6 +33,10 @@ public class CryptographicSignatureConstraintValidator implements ConstraintVali
 
     @Override
     public boolean isValid(Transaction transaction, ConstraintValidatorContext constraintValidatorContext) {
+        // null value checks
+        if (transaction == null)
+            return false;
+
         // for each transaction output verify its signature
         try {
             for (TransactionOutput transactionOutput : transaction.getOutputs()) {

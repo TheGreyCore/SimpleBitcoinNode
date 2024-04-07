@@ -2,6 +2,7 @@ package org.students.simplebitcoinwallet.entity.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.students.simplebitcoinwallet.entity.Transaction;
 import org.students.simplebitcoinwallet.entity.TransactionOutput;
 import org.students.simplebitcoinwallet.entity.validation.annotations.DoubleSpendingConstraint;
@@ -13,12 +14,9 @@ import java.util.logging.Logger;
  * Validates if Transaction inputs have not been spent before.
  */
 public class DoubleSpendingConstraintValidator implements ConstraintValidator<DoubleSpendingConstraint, Transaction> {
-    private final TransactionOutputRepository transactionOutputRepository;
+    @Autowired
+    private TransactionOutputRepository transactionOutputRepository;
     private final Logger logger = Logger.getLogger(DoubleSpendingConstraintValidator.class.getName());
-
-    public DoubleSpendingConstraintValidator(TransactionOutputRepository transactionOutputRepository) {
-        this.transactionOutputRepository = transactionOutputRepository;
-    }
 
     @Override
     public void initialize(DoubleSpendingConstraint constraintAnnotation) {
@@ -27,6 +25,10 @@ public class DoubleSpendingConstraintValidator implements ConstraintValidator<Do
 
     @Override
     public boolean isValid(Transaction transaction, ConstraintValidatorContext context) {
+        // null value checks
+        if (transaction == null)
+            return false;
+
         // for each input check if it is a valid
         for (TransactionOutput utxoCandidate : transaction.getInputs()) {
             if (transactionOutputRepository.findUtxoCountBySignature(utxoCandidate.getSignature()) > 0) {

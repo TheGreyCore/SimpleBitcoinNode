@@ -3,11 +3,8 @@ package org.students.simplebitcoinwallet.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.students.simplebitcoinwallet.entity.validation.annotations.CryptographicSignatureConstraint;
-import org.students.simplebitcoinwallet.entity.validation.annotations.DoubleSpendingConstraint;
-import org.students.simplebitcoinwallet.entity.validation.annotations.TransactionHashConstraint;
 
-import java.io.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -19,9 +16,9 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "ledger")
-@TransactionHashConstraint
-@DoubleSpendingConstraint
-@CryptographicSignatureConstraint
+//@TransactionHashConstraint
+//@DoubleSpendingConstraint
+//@CryptographicSignatureConstraint
 public class Transaction implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,7 +38,7 @@ public class Transaction implements Serializable {
     @NotNull(message = "All transactions must have at least one output")
     private List<TransactionOutput> outputs;
 
-    @Column(length = 177)
+    @Column(length = 178)
     @NotNull(message = "Sender public key must be present in the transaction")
     private String senderPublicKey;
 

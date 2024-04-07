@@ -38,17 +38,13 @@ public class TransactionDataGenerator implements CommandLineRunner {
     public void run(String... args) throws Exception {
         // check if enough arguments were specified
         if (args.length < 4) {
-            System.err.println("Usage: java -jar simple-bitcoin-node.jar seed <circulation> <max-recipients> <max-tree-depth>");
-            System.err.println("\n<circulation> - how many tokens should be let into circulation");
-            System.err.println("\n<max-recipients> - number of recipients to where each wallet sends their tokens");
-            System.err.println("\"<max-tree-depth> - maximum depth of the transaction tree");
-            System.exit(1);
+            return;
         }
 
         // generation variables
-        this.initialCirculation = new BigDecimal(args[0]);
-        this.maxRecipientsFromWallet = Integer.parseInt(args[1]);
-        this.maxTreeDepth = Integer.parseInt(args[2]);
+        this.initialCirculation = new BigDecimal(args[1]);
+        this.maxRecipientsFromWallet = Integer.parseInt(args[2]);
+        this.maxTreeDepth = Integer.parseInt(args[3]);
 
         generateTransactions();
         transactionRepository.saveAll(transactions);
@@ -57,7 +53,7 @@ public class TransactionDataGenerator implements CommandLineRunner {
 
     private TransactionOutput makeSatoshiUTXO(KeyPair satoshiWallet) {
         return TransactionOutput.builder()
-            .signature("0".repeat(176))
+            .signature("0".repeat(142))
             .amount(initialCirculation)
             .receiverPublicKey(Encoding.defaultPubKeyEncoding(satoshiWallet.getPublic().getEncoded()))
             .build();
@@ -84,7 +80,7 @@ public class TransactionDataGenerator implements CommandLineRunner {
 
             for (int i = 0; i < maxRecipientsFromWallet; i++) {
                 Random random = new Random(System.nanoTime());
-                double f64transferAmount = random.nextDouble(0.001, sum.doubleValue() / (double)maxRecipientsFromWallet);
+                double f64transferAmount = random.nextDouble(0.00000001, sum.doubleValue() / (double)maxRecipientsFromWallet);
                 // transfer amount with 8 digit precision
                 final BigDecimal transferAmount = new BigDecimal(String.format("%.8f", f64transferAmount));
 
@@ -98,6 +94,10 @@ public class TransactionDataGenerator implements CommandLineRunner {
                 // construct a new Transaction object
                 KeyPair receiverKeys = asymmetricCryptographyService.generateNewKeypair();
                 Transaction transaction = createNewTransaction(bestTransactionInputs, wallet.getKeyPair(), receiverKeys, transferAmount);
+
+                // check if there is change TransactionOutput and add it to UTXOs
+                if (transaction.getOutputs().size() == 2)
+                    utxos.add(transaction.getOutputs().get(1));
 
                 // create a new Wallet instance and add it to the queue
                 Wallet newWallet = new Wallet(receiverKeys, transaction.getOutputs(), wallet.getDepthLevel() + 1);
@@ -130,7 +130,7 @@ public class TransactionDataGenerator implements CommandLineRunner {
         );
 
         // check if change needs to be returned to the sender
-        if (change.compareTo(BigDecimal.ZERO) < 0) {
+        if (change.compareTo(BigDecimal.ZERO) > 0) {
             transaction.getOutputs().add(
                 TransactionOutput.builder()
                     .amount(change)
@@ -165,9 +165,10 @@ public class TransactionDataGenerator implements CommandLineRunner {
         BigDecimal sum = BigDecimal.ZERO;
         for (TransactionOutput utxo : utxos) {
             sum = sum.add(utxo.getAmount());
+            inputs.add(utxo);
 
-            if (requiredSum.compareTo(sum) <= 0)
-                inputs.add(utxo);
+            if (sum.compareTo(requiredSum) >= 0)
+                break;
         }
 
         return inputs;

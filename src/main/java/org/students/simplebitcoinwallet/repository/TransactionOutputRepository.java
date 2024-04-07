@@ -2,6 +2,7 @@ package org.students.simplebitcoinwallet.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 import org.students.simplebitcoinwallet.entity.TransactionOutput;
 
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.Optional;
 /**
  * Data repository for querying transaction outputs
  */
+@Repository
 public interface TransactionOutputRepository extends JpaRepository<TransactionOutput, Integer> {
     /**
      * Finds the number of unspent transaction outputs with given signature.
