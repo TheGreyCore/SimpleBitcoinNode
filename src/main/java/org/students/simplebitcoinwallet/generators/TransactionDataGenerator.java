@@ -1,5 +1,7 @@
 package org.students.simplebitcoinwallet.generators;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.students.simplebitcoinwallet.entity.Transaction;
@@ -14,14 +16,12 @@ import java.security.KeyPair;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.logging.Logger;
 
 @Component
 public class TransactionDataGenerator implements CommandLineRunner {
     // injected dependencies
     private final AsymmetricCryptographyService asymmetricCryptographyService;
     private final TransactionRepository transactionRepository;
-    private final Logger logger = Logger.getLogger(TransactionDataGenerator.class.getName());
 
     // initialized from TransactionDataGenerator.run
     private BigDecimal initialCirculation; // how many tokens should be let into circulation
@@ -38,11 +38,13 @@ public class TransactionDataGenerator implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // check if enough arguments were specified
+        Logger logger = LoggerFactory.getLogger(TransactionDataGenerator.class);
+
         if (args.length < 4) {
             return;
         }
 
+        logger.info("Running pseudo-data generating");
         // generation variables
         logger.info("Starting transaction data generation");
         this.initialCirculation = new BigDecimal(args[1]);
