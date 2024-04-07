@@ -13,6 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 public class Wallet {
     private KeyPair keyPair;
-    private List<TransactionOutput> unspentTransactionOutputs;
+    private TransactionOutput unspentTransactionOutput;
     private Integer depthLevel;
 }

@@ -38,6 +38,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
      * @param publicKey specifies the wallet's public key to use for querying
      * @return list of transactions matching the criteria
      */
-    @Query(value = "SELECT DISTINCT l.* FROM LEDGER l JOIN TRANSACTION_OUTPUT t on l.ID=t.OUTPUT_ID WHERE t.RECEIVER_PUBLIC_KEY=?1 OR l.SENDER_PUBLIC_KEY='?1'", nativeQuery = true)
+    @Query(value = "SELECT DISTINCT l.* FROM LEDGER l JOIN TRANSACTION_OUTPUT t on l.ID=t.OUTPUT_ID WHERE t.RECEIVER_PUBLIC_KEY=?1 OR l.SENDER_PUBLIC_KEY=?1", nativeQuery = true)
     List<Transaction> findAllTransactionsByPublicKeyAddress(String publicKey);
 }

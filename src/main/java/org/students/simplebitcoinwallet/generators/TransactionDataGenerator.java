@@ -6,6 +6,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.students.simplebitcoinwallet.entity.Transaction;
 import org.students.simplebitcoinwallet.entity.TransactionOutput;
+import org.students.simplebitcoinwallet.repository.TransactionOutputRepository;
 import org.students.simplebitcoinwallet.repository.TransactionRepository;
 import org.students.simplebitcoinwallet.service.AsymmetricCryptographyService;
 import org.students.simplebitcoinwallet.util.Encoding;
@@ -40,9 +41,8 @@ public class TransactionDataGenerator implements CommandLineRunner {
     public void run(String... args) throws Exception {
         Logger logger = LoggerFactory.getLogger(TransactionDataGenerator.class);
 
-        if (args.length < 4) {
+        if (args.length < 4 || !args[0].equals("seed"))
             return;
-        }
 
         logger.info("Running pseudo-data generating");
         // generation variables
@@ -53,11 +53,15 @@ public class TransactionDataGenerator implements CommandLineRunner {
 
         generateTransactions();
         logger.info("Finished transaction data generation");
-        transactionRepository.saveAll(transactions);
         logger.info("Saving transaction data into TransactionRepository");
+        transactionRepository.saveAll(transactions);
     }
 
-
+    /**
+     * Create the very first transaction output (aka mint tokens into circulation)
+     * @param satoshiWallet specifies a keypair of the very first wallet holding all tokens in circulation
+     * @return
+     */
     private TransactionOutput makeSatoshiUTXO(KeyPair satoshiWallet) {
         return TransactionOutput.builder()
             .signature("0".repeat(142))
@@ -66,13 +70,19 @@ public class TransactionDataGenerator implements CommandLineRunner {
             .build();
     }
 
+    /**
+     * Generate random transactions according to specified parameters.<br>
+     * The transaction generation algorithm works by constructing a tree from generated transactions.
+     * Initially, Satoshi holds some amount of tokens, of which most of it he sends to N other wallets and those N wallets send to other N wallets and so on.
+     * @throws Exception
+     */
     private void generateTransactions() throws Exception {
         // generate the initial seed TransactionOutput (aka mint some coins into the circulation)
         KeyPair satoshiWalletKeys = asymmetricCryptographyService.generateNewKeypair();
 
         // queue is used for breadth-first tree construction
         Queue<Wallet> queue = new ArrayDeque<>();
-        queue.add(new Wallet(satoshiWalletKeys, new LinkedList<>(Collections.singletonList(makeSatoshiUTXO(satoshiWalletKeys))), 0));
+        queue.add(new Wallet(satoshiWalletKeys, makeSatoshiUTXO(satoshiWalletKeys), 0));
 
         // start adding new transactions
         while (!queue.isEmpty()) {
@@ -81,9 +91,7 @@ public class TransactionDataGenerator implements CommandLineRunner {
                 break;
 
             // sum up how much money does the wallet have
-            BigDecimal sum = BigDecimal.ZERO;
-            for (TransactionOutput output : wallet.getUnspentTransactionOutputs())
-                sum = sum.add(output.getAmount());
+            final BigDecimal sum = wallet.getUnspentTransactionOutput().getAmount();
 
             for (int i = 0; i < maxRecipientsFromWallet; i++) {
                 Random random = new Random(System.nanoTime());
@@ -91,23 +99,16 @@ public class TransactionDataGenerator implements CommandLineRunner {
                 // transfer amount with 8 digit precision
                 final BigDecimal transferAmount = new BigDecimal(String.format("%.8f", f64transferAmount));
 
-                List<TransactionOutput> utxos = wallet.getUnspentTransactionOutputs();
-                List<TransactionOutput> bestTransactionInputs = findBestTransactionInputs(utxos, transferAmount);
-
-                // remove bestCombo elements from utxos
-                for (TransactionOutput input : bestTransactionInputs)
-                    utxos.remove(input);
-
                 // construct a new Transaction object
                 KeyPair receiverKeys = asymmetricCryptographyService.generateNewKeypair();
-                Transaction transaction = createNewTransaction(bestTransactionInputs, wallet.getKeyPair(), receiverKeys, transferAmount);
+                Transaction transaction = createNewTransaction(Collections.singletonList(wallet.getUnspentTransactionOutput()), wallet.getKeyPair(), receiverKeys, transferAmount);
 
-                // check if there is change TransactionOutput and add it to UTXOs
-                if (transaction.getOutputs().size() == 2)
-                    utxos.add(transaction.getOutputs().get(1));
+                // set returned change as new UTXO of current wallet
+                if (transaction.getOutputs().size() >= 2)
+                    wallet.setUnspentTransactionOutput(transaction.getOutputs().get(1));
 
                 // create a new Wallet instance and add it to the queue
-                Wallet newWallet = new Wallet(receiverKeys, transaction.getOutputs(), wallet.getDepthLevel() + 1);
+                Wallet newWallet = new Wallet(receiverKeys, transaction.getOutputs().getFirst(), wallet.getDepthLevel() + 1);
                 queue.add(newWallet);
 
                 // add Transaction to the list
@@ -116,6 +117,15 @@ public class TransactionDataGenerator implements CommandLineRunner {
         }
     }
 
+    /**
+     * Builds a new transaction from given data
+     * @param inputs specifies unspent transaction outputs to use as inputs for new transaction
+     * @param senderKeys specifies the sender's wallet keypair
+     * @param receiverKeys receiver's wallet keypair
+     * @param sum total sum of tokens to send to receiver's address
+     * @return transaction object specifies the transaction constructed from given arguments
+     * @throws Exception
+     */
     private Transaction createNewTransaction(List<TransactionOutput> inputs, KeyPair senderKeys, KeyPair receiverKeys, BigDecimal sum) throws Exception {
         // calculate the amount of change that needs to be returned to the sender
         BigDecimal change = BigDecimal.ZERO;
@@ -129,21 +139,17 @@ public class TransactionDataGenerator implements CommandLineRunner {
         transaction.setOutputs(new LinkedList<>());
         transaction.setSenderPublicKey(Encoding.defaultPubKeyEncoding(senderKeys.getPublic().getEncoded()));
         transaction.setTimestamp(LocalDateTime.now(ZoneId.of("UTC")));
-        transaction.getOutputs().add(
-            TransactionOutput.builder()
-                .amount(sum)
-                .receiverPublicKey(Encoding.defaultPubKeyEncoding(receiverKeys.getPublic().getEncoded()))
-                .build()
-        );
+        transaction.getOutputs().add(TransactionOutput.builder()
+            .amount(sum)
+            .receiverPublicKey(Encoding.defaultPubKeyEncoding(receiverKeys.getPublic().getEncoded()))
+            .build());
 
         // check if change needs to be returned to the sender
         if (change.compareTo(BigDecimal.ZERO) > 0) {
-            transaction.getOutputs().add(
-                TransactionOutput.builder()
-                    .amount(change)
-                    .receiverPublicKey(Encoding.defaultPubKeyEncoding(senderKeys.getPublic().getEncoded()))
-                    .build()
-            );
+            transaction.getOutputs().add(TransactionOutput.builder()
+                .amount(change)
+                .receiverPublicKey(Encoding.defaultPubKeyEncoding(senderKeys.getPublic().getEncoded()))
+                .build());
         }
 
         // calculate transaction hash
@@ -162,22 +168,5 @@ public class TransactionDataGenerator implements CommandLineRunner {
         }
 
         return transaction;
-    }
-
-
-    private List<TransactionOutput> findBestTransactionInputs(List<TransactionOutput> utxos, BigDecimal requiredSum) {
-        utxos.sort(Comparator.comparing(TransactionOutput::getAmount));
-        List<TransactionOutput> inputs = new LinkedList<>();
-
-        BigDecimal sum = BigDecimal.ZERO;
-        for (TransactionOutput utxo : utxos) {
-            sum = sum.add(utxo.getAmount());
-            inputs.add(utxo);
-
-            if (sum.compareTo(requiredSum) >= 0)
-                break;
-        }
-
-        return inputs;
     }
 }

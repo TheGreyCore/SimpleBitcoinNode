@@ -31,7 +31,7 @@ public class TransactionService {
     public List<Transaction> getTransactions(String pubKey, String type) {
         return switch (type) {
             case "sent" -> transactionRepository.findSentTransactionsByPublicKeyAddress(pubKey);
-            case "received" -> transactionRepository.findAllReceivedTransactionsByPublicKeyAddress(pubKey);
+            case "received" -> transactionRepository.findReceivedTransactionsExcludeReturns(pubKey);
             case "all" -> transactionRepository.findAllTransactionsByPublicKeyAddress(pubKey);
             default -> null;
         };
