@@ -1,5 +1,6 @@
 package org.students.simplebitcoinwallet.service;
 
+import org.springframework.stereotype.Service;
 import org.students.simplebitcoinwallet.entity.Transaction;
 import org.students.simplebitcoinwallet.entity.TransactionOutput;
 import org.students.simplebitcoinwallet.exceptions.crypto.MalformedKeyException;
@@ -16,6 +17,7 @@ import java.util.logging.Logger;
 /**
  * Provides a high level interface for performing cryptographic operations such as keypair generation, signature verification and digital signing.
  */
+@Service
 public abstract class AsymmetricCryptographyService {
     private final Logger logger;
     protected AsymmetricCryptographyService(String className) {

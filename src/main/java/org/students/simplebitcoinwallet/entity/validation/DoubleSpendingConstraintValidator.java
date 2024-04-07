@@ -2,6 +2,7 @@ package org.students.simplebitcoinwallet.entity.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.students.simplebitcoinwallet.entity.Transaction;
 import org.students.simplebitcoinwallet.entity.TransactionOutput;
 import org.students.simplebitcoinwallet.entity.validation.annotations.DoubleSpendingConstraint;
@@ -16,6 +17,7 @@ public class DoubleSpendingConstraintValidator implements ConstraintValidator<Do
     private final TransactionOutputRepository transactionOutputRepository;
     private final Logger logger = Logger.getLogger(DoubleSpendingConstraintValidator.class.getName());
 
+    @Autowired
     public DoubleSpendingConstraintValidator(TransactionOutputRepository transactionOutputRepository) {
         this.transactionOutputRepository = transactionOutputRepository;
     }
@@ -27,6 +29,10 @@ public class DoubleSpendingConstraintValidator implements ConstraintValidator<Do
 
     @Override
     public boolean isValid(Transaction transaction, ConstraintValidatorContext context) {
+        // null value checks
+        if (transaction == null)
+            return false;
+
         // for each input check if it is a valid
         for (TransactionOutput utxoCandidate : transaction.getInputs()) {
             if (transactionOutputRepository.findUtxoCountBySignature(utxoCandidate.getSignature()) > 0) {

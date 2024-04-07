@@ -2,17 +2,24 @@ package org.students.simplebitcoinwallet.util;
 
 import org.students.simplebitcoinwallet.exceptions.encoding.InvalidEncodedStringException;
 
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Encoding utility class
  */
 public class Encoding {
+    private static final String base58Charset = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
     /**
      * Encodes the public key with current default public key encoding
      * @param pubKey represents the public key as byte array to encode
      * @return string value containing the encoded public key
      */
     public static String defaultPubKeyEncoding(byte[] pubKey) {
-        return toHexString(pubKey);
+        return base58Encode(pubKey);
     }
 
     /**
@@ -22,7 +29,7 @@ public class Encoding {
      * @throws InvalidEncodedStringException
      */
     public static byte[] defaultPubKeyDecoding(String encodedPublicKey) throws InvalidEncodedStringException {
-        return hexStringToBytes(encodedPublicKey);
+        return base58Decode(encodedPublicKey);
     }
 
     /**
@@ -48,7 +55,7 @@ public class Encoding {
      * @param hexString specifies the hexadecimal string to decode. The string is assumed to only contain lowercase numerical or lowercase `abcdef` characters.
      *                  Other-wise the method call will fail with InvalidHexStringException.
      * @return array of decoded bytes
-     * @throws InvalidEncodedStringException when the
+     * @throws InvalidEncodedStringException
      */
     public static byte[] hexStringToBytes(String hexString) throws InvalidEncodedStringException {
         validateHexStringOrException(hexString);
@@ -60,6 +67,102 @@ public class Encoding {
         }
 
         return bytes;
+    }
+
+    /**
+     * Encodes a byte array as base58 string
+     * @param bytes represents the byte array to encode
+     * @return string containing base58 representation of the data
+     */
+    public static String base58Encode(byte[] bytes) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        byte[] copy = Arrays.copyOf(bytes, bytes.length);
+        for (int i = 0; i < copy.length;) {
+            int carry = 0;
+            for (int j = 0; j < copy.length; j++) {
+                int digit = (copy[j] & 0xff) + (carry << 8);
+                copy[j] = (byte) (digit / 58);
+                carry = digit % 58;
+            }
+
+            if (copy[i] == 0)
+                i++;
+            stringBuilder.append(base58Charset.charAt(carry));
+        }
+
+        return stringBuilder.reverse().toString();
+    }
+
+    /**
+     * Decodes base58 encoded string into a byte array
+     * @param string specifies base58 encoded string to decode
+     * @return byte array containing decoded data
+     * @throws InvalidEncodedStringException
+     */
+    public static byte[] base58Decode(String string) throws InvalidEncodedStringException {
+        List<Byte> byteList = new ArrayList<>();
+
+        // represent base58 integer as byte array and count leading zeroes
+        byte[] base58AsBytes = new byte[string.length()];
+        for (int i = 0; i < string.length(); i++) {
+            base58AsBytes[i] = (byte) binarySearchBase58AlphabetIndex(string.charAt(i));
+        }
+
+        // ugly baseness conversion algorithm all over again
+        for (int base58AsByte : base58AsBytes) {
+            int carry = base58AsByte;
+            for (int j = 0; j < byteList.size(); j++) {
+                // evil bit manipulations (⊙_⊙)
+                carry += (byteList.get(j) & 0xff) * 58;
+                byteList.set(j, (byte) (carry & 0xff));
+                carry >>= 8;
+            }
+
+            // decompose carry bits into bytes
+            while (carry > 0) {
+                byteList.add((byte) (carry & 0xff));
+                carry >>= 8;
+            }
+        }
+
+        // deal with leading zeroes
+        for (int i = 0; i < base58AsBytes.length && base58AsBytes[i] == (byte)0; i++) {
+            byteList.add((byte)0);
+        }
+
+        // convert list to byte array
+        byte[] res = new byte[byteList.size()];
+        for (int i = 0; i < byteList.size(); i++)
+            res[i] = byteList.get(byteList.size() - 1 - i);
+        return res;
+    }
+
+    public static void main(String[] args) throws InvalidEncodedStringException {
+        String msg = "Hello world!";
+        String encoded = base58Encode(msg.getBytes(StandardCharsets.UTF_8));
+        System.out.println(encoded);
+        System.out.println(new String(base58Decode(encoded)));
+    }
+
+    private static int binarySearchBase58AlphabetIndex(char c) throws InvalidEncodedStringException {
+        // find character's index using binary search
+        int left = 0; // inclusive
+        int right = base58Charset.length(); // exclusive
+        int mid = (left + right) / 2;
+
+        while (base58Charset.charAt(mid) != c) {
+            if (right - left <= 1)
+                throw new InvalidEncodedStringException("Base58 decoding failed: character '" + c + "' is not in Base58 alphabet");
+
+            if (base58Charset.charAt(mid) > c)
+                right = mid;
+            else if (base58Charset.charAt(mid) < c)
+                left = mid;
+            mid = (left + right) / 2;
+        }
+
+        return mid;
     }
 
     private static void validateHexStringOrException(String hexString) throws InvalidEncodedStringException {

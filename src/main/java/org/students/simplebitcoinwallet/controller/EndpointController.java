@@ -1,15 +1,14 @@
-package org.students.simplebitcoinwallet.endpoint;
+package org.students.simplebitcoinwallet.controller;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.students.simplebitcoinwallet.service.EndpointService;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController()
-@RequestMapping("/api")
+@RequestMapping("/blockchain")
 public class EndpointController {
     private final EndpointService endpointService;
 
