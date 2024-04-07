@@ -1,5 +1,7 @@
 package org.students.simplebitcoinwallet.controller;
 
+import jakarta.validation.Valid;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.students.simplebitcoinwallet.entity.Transaction;
 import org.students.simplebitcoinwallet.service.TransactionService;
@@ -39,9 +41,22 @@ public class TransactionsController {
      * @param transaction This is the transaction to be created.
      * @return int This returns the result of the transaction creation.
      */
+    @Valid
     @PostMapping("/send")
     public int newTransactions(@RequestParam Transaction transaction){
         return transactionService.newTransactions(transaction);
     }
+
+    /**
+     * This method is used to handle MethodArgumentNotValidException.
+     *
+     * @param e This is the exception to be handled.
+     * @return int This returns the HTTP status code 400 indicating a bad request.
+     */
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    public int handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        return 400;
+    }
+
 
 }
