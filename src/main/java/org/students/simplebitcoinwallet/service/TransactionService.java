@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.students.simplebitcoinwallet.entity.Transaction;
 import org.students.simplebitcoinwallet.repository.TransactionRepository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -35,5 +36,21 @@ public class TransactionService {
             case "all" -> transactionRepository.findAllTransactionsByPublicKeyAddress(pubKey);
             default -> null;
         };
+    }
+
+    /**
+     * This method is used to save new transactions.
+     *
+     * @param transaction This is the transaction to be created.
+     * @return int This returns the HTTP status code of the transaction creation operation.
+     *             It returns 201 if the transaction was successfully created, and 400 if an exception occurred.
+     */
+    public int newTransactions(Transaction transaction) {
+        try {
+            transactionRepository.save(transaction);
+        } catch (Exception e){
+            return 400;
+        }
+        return 201;
     }
 }
