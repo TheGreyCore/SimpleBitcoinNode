@@ -1,18 +1,27 @@
 package org.students.simplebitcoinwallet.controller;
 
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.students.simplebitcoinwallet.entity.Transaction;
+import org.students.simplebitcoinwallet.representation.BadRequestErrorResponse;
+import org.students.simplebitcoinwallet.representation.ValidationErrorResponse;
 import org.students.simplebitcoinwallet.service.TransactionService;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/blockchain")
 public class TransactionsController {
     private final TransactionService transactionService;
+
+    Logger logger = Logger.getLogger(TransactionsController.class.getName());
 
     public TransactionsController(TransactionService transactionService) {
         this.transactionService = transactionService;
@@ -39,23 +48,31 @@ public class TransactionsController {
      * This method is used to create new transactions.
      *
      * @param transaction This is the transaction to be created.
-     * @return int This returns the result of the transaction creation.
+     * @return returns the result of the transaction creation.
      */
     @Valid
     @PostMapping("/send")
-    public int newTransactions(@RequestParam Transaction transaction){
-        return transactionService.newTransactions(transaction);
+    public ResponseEntity<?> newTransactions(@RequestParam Transaction transaction){
+        return ResponseEntity.ok().body(transactionService.newTransactions(transaction));
     }
 
     /**
-     * This method is used to handle MethodArgumentNotValidException.
+     * Handles MethodArgumentNotValidException exceptions.
      *
-     * @param e This is the exception to be handled.
-     * @return int This returns the HTTP status code 400 indicating a bad request.
+     * @param e The MethodArgumentNotValidException that was thrown.
+     * @return ResponseEntity containing the BadRequestErrorResponse with validation errors.
      */
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public int handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        return 400;
+    public ResponseEntity<BadRequestErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        logger.warning("MethodArgumentNotValidException thrown at TransactionsController: " + e.getMessage());
+
+        Map<String, String> errors = new HashMap<>();
+        e.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldError = ((FieldError)error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldError, errorMessage);
+        });
+        return ResponseEntity.badRequest().body(new ValidationErrorResponse(errors));
     }
 
 
