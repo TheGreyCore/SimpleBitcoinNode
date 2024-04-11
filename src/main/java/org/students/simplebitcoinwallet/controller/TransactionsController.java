@@ -2,7 +2,6 @@ package org.students.simplebitcoinwallet.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.students.simplebitcoinwallet.entity.Transaction;
@@ -10,7 +9,6 @@ import org.students.simplebitcoinwallet.representation.BadRequestErrorResponse;
 import org.students.simplebitcoinwallet.representation.ValidationErrorResponse;
 import org.students.simplebitcoinwallet.service.TransactionService;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,9 +48,10 @@ public class TransactionsController {
      * @param transaction This is the transaction to be created.
      * @return returns the result of the transaction creation.
      */
-    @Valid
     @PostMapping("/send")
-    public ResponseEntity<?> newTransactions(@RequestParam Transaction transaction){
+    public ResponseEntity<?> newTransactions(@Valid @RequestBody Transaction transaction) {
+        // Custom constraint validation using @Valid annotation on the arguments works as expected.
+        // All custom ConstraintValidators have their dependencies injected as expected.
         return ResponseEntity.ok().body(transactionService.newTransactions(transaction));
     }
 
@@ -68,9 +67,9 @@ public class TransactionsController {
 
         Map<String, String> errors = new HashMap<>();
         e.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldError = ((FieldError)error).getField();
+            String objectName = error.getObjectName();
             String errorMessage = error.getDefaultMessage();
-            errors.put(fieldError, errorMessage);
+            errors.put(objectName, errorMessage);
         });
         return ResponseEntity.badRequest().body(new ValidationErrorResponse(errors));
     }

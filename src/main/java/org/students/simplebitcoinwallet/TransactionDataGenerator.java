@@ -1,12 +1,11 @@
-package org.students.simplebitcoinwallet.generators;
+package org.students.simplebitcoinwallet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.students.simplebitcoinwallet.entity.Transaction;
 import org.students.simplebitcoinwallet.entity.TransactionOutput;
-import org.students.simplebitcoinwallet.repository.TransactionOutputRepository;
 import org.students.simplebitcoinwallet.repository.TransactionRepository;
 import org.students.simplebitcoinwallet.service.AsymmetricCryptographyService;
 import org.students.simplebitcoinwallet.util.Encoding;
@@ -14,11 +13,13 @@ import org.students.simplebitcoinwallet.util.Wallet;
 
 import java.math.BigDecimal;
 import java.security.KeyPair;
+import java.security.Security;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.logging.Logger;
 import java.util.*;
 
-@Component
+@SpringBootApplication
 public class TransactionDataGenerator implements CommandLineRunner {
     // injected dependencies
     private final AsymmetricCryptographyService asymmetricCryptographyService;
@@ -32,6 +33,7 @@ public class TransactionDataGenerator implements CommandLineRunner {
     // list of Transactions
     List<Transaction> transactions = new ArrayList<>();
 
+    @Autowired
     public TransactionDataGenerator(AsymmetricCryptographyService asymmetricCryptographyService, TransactionRepository transactionRepository) {
         this.asymmetricCryptographyService = asymmetricCryptographyService;
         this.transactionRepository = transactionRepository;
@@ -39,7 +41,7 @@ public class TransactionDataGenerator implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        Logger logger = LoggerFactory.getLogger(TransactionDataGenerator.class);
+        Logger logger = Logger.getLogger(TransactionDataGenerator.class.getName());
 
         if (args.length < 4 || !args[0].equals("seed"))
             return;
@@ -168,5 +170,11 @@ public class TransactionDataGenerator implements CommandLineRunner {
         }
 
         return transaction;
+    }
+
+    /* Main method */
+    public static void main(String[] args) {
+        Security.insertProviderAt(new org.bouncycastle.jce.provider.BouncyCastleProvider(), 1);
+        SpringApplication.run(TransactionDataGenerator.class, args);
     }
 }

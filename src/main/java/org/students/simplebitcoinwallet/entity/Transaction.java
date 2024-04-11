@@ -3,6 +3,9 @@ package org.students.simplebitcoinwallet.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.students.simplebitcoinwallet.entity.validation.annotations.CryptographicSignatureConstraint;
+import org.students.simplebitcoinwallet.entity.validation.annotations.DoubleSpendingConstraint;
+import org.students.simplebitcoinwallet.entity.validation.annotations.TransactionHashConstraint;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -16,9 +19,10 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "ledger")
-//@TransactionHashConstraint
-//@DoubleSpendingConstraint
-//@CryptographicSignatureConstraint
+// These are the problematic ConstraintValidator annotations which cause problems when saving transactions into JpaRepository
+@TransactionHashConstraint
+@DoubleSpendingConstraint
+@CryptographicSignatureConstraint
 public class Transaction implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

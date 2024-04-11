@@ -26,7 +26,7 @@ public abstract class AsymmetricCryptographyService {
 
     /**
      * Digests given messageObject and returns its calculated hash. The specific hashing algorithm is implementation dependent
-     * @param messageObject specifies the Serializable object to use as a message for hashing
+     * @param messageObject specifies the object to use as a message for hashing
      * @return byte array containing the calculated hash
      * @throws SerializationException
      */

@@ -1,17 +1,17 @@
 package org.students.simplebitcoinwallet.service;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.students.simplebitcoinwallet.entity.Transaction;
 import org.students.simplebitcoinwallet.repository.TransactionRepository;
 
-import java.math.BigDecimal;
 import java.util.List;
+import java.util.logging.Logger;
 
 @Service
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
+    private final Logger logger = Logger.getLogger(TransactionService.class.getName());
 
     public TransactionService(TransactionRepository transactionRepository) {
         this.transactionRepository = transactionRepository;
@@ -47,11 +47,14 @@ public class TransactionService {
      */
     
     public int newTransactions(Transaction transaction) {
-        try {
-            transactionRepository.save(transaction);
-        } catch (Exception e){
+        //try {
+        // TransactionRepository.save() call fails if the entity is annotated with custom constraints that have dependencies
+        // Is there a way to avoid validation in save() calls because the validation would be done in the endpoint controller anyway?
+        transactionRepository.save(transaction);
+        /*} catch (Exception e){
+            logger.warning(e.getMessage());
             return 400;
-        }
+        }*/
         return 201;
     }
 }
