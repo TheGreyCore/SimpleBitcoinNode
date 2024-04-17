@@ -1,9 +1,6 @@
 package org.students.simplebitcoinwallet.service;
 
-import org.springframework.boot.autoconfigure.web.embedded.TomcatVirtualThreadsWebServerFactoryCustomizer;
 import org.springframework.stereotype.Service;
-import org.students.simplebitcoinwallet.entity.Transaction;
-import org.students.simplebitcoinwallet.entity.TransactionOutput;
 import org.students.simplebitcoinwallet.exceptions.crypto.MalformedKeyException;
 import org.students.simplebitcoinwallet.exceptions.crypto.MalformedSignatureException;
 import org.students.simplebitcoinwallet.exceptions.encoding.SerializationException;

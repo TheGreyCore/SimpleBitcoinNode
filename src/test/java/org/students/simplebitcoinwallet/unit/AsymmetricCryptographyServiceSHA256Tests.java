@@ -3,11 +3,7 @@ package org.students.simplebitcoinwallet.unit;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.students.simplebitcoinwallet.exceptions.encoding.SerializationException;
-import org.students.simplebitcoinwallet.unit.transaction.TestTransactionBuilder;
-import org.students.simplebitcoinwallet.unit.transaction.TransactionContainer;
 import org.students.simplebitcoinwallet.util.Encoding;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
