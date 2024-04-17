@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 @Table(name = "transaction_output")
-public class TransactionOutput implements Serializable {
+public class TransactionOutput {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

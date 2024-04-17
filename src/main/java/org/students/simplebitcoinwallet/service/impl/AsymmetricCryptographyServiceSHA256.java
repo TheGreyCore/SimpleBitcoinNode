@@ -3,6 +3,7 @@ package org.students.simplebitcoinwallet.service.impl;
 import org.students.simplebitcoinwallet.exceptions.encoding.SerializationException;
 import org.students.simplebitcoinwallet.service.AsymmetricCryptographyService;
 
+import java.io.Externalizable;
 import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

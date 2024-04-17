@@ -25,14 +25,14 @@ public class TestTransactionBuilder {
                 // Bob received 1.5 BTC from Alice
                 TransactionOutput.builder()
                     .id(0)
-                    .signature("0".repeat(143)) // some random input signature
+                    .signature("0".repeat(144)) // some random input signature
                     .amount(new BigDecimal("1.5"))
                     .receiverPublicKey(senderPublicKey)
                     .build(),
                 // Bob also received 2.4 BTC from Charlie
                 TransactionOutput.builder()
                     .id(1)
-                    .signature("1".repeat(143)) // -"-
+                    .signature("1".repeat(144)) // -"-
                     .amount(new BigDecimal("2.4"))
                     .receiverPublicKey(senderPublicKey)
                     .build()
@@ -43,12 +43,14 @@ public class TestTransactionBuilder {
                         .id(2)
                         .amount(new BigDecimal("3.0"))
                         .receiverPublicKey(receiverPublicKey)
+                        .signature("0".repeat(144))
                         .build(),
                     // 0.9 BTC is transferred back to Bob
                     TransactionOutput.builder()
                         .id(3)
                         .amount(new BigDecimal("0.9"))
                         .receiverPublicKey(senderPublicKey)
+                        .signature("1".repeat(144))
                         .build()
                 ))
                 .senderPublicKey(senderPublicKey)
@@ -62,7 +64,7 @@ public class TestTransactionBuilder {
      */
     public static List<TransactionContainer> buildAllTransactions() {
         return List.of(
-            new TransactionContainer("aliceSendsToBobZeroSenderKeyOneReceiverKey", aliceSendsToBobCustomKeys("0".repeat(177), "1".repeat(177)), null)
+            new TransactionContainer("aliceSendsToBobZeroSenderKeyOneReceiverKey", aliceSendsToBobCustomKeys("1".repeat(64), "2".repeat(176)), null)
         );
     }
 }

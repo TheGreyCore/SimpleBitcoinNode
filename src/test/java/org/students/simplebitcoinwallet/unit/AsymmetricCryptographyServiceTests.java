@@ -32,7 +32,7 @@ public abstract class AsymmetricCryptographyServiceTests {
     public void testTransactionSignatureVerification_ValidSignature_DoesNotThrow() {
         // key pair acts as our "wallet"
         KeyPair keyPair = asymmetricCryptographyService.generateNewKeypair();
-        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(Encoding.defaultPubKeyEncoding(keyPair.getPublic().getEncoded()), "0".repeat(177));
+        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(Encoding.defaultPubKeyEncoding(keyPair.getPublic().getEncoded()), "1".repeat(64));
 
         // the transaction is hashed
         try {

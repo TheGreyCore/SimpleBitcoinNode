@@ -16,6 +16,7 @@ import org.students.simplebitcoinwallet.unit.transaction.TestTransactionBuilder;
 import org.students.simplebitcoinwallet.util.Encoding;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,14 +34,28 @@ public class TransactionValidationTests {
     @Mock
     private AsymmetricCryptographyService asymmetricCryptographyService;
 
+    private final String senderPublicKey;
+    private final String recipientPublicKey;
+
+    public TransactionValidationTests() {
+        byte[] senderPublicKey = new byte[88];
+        Arrays.fill(senderPublicKey, (byte)1);
+        byte[] recipientPublicKey = new byte[88];
+        Arrays.fill(recipientPublicKey, (byte)2);
+
+        this.senderPublicKey = Encoding.defaultPubKeyEncoding(senderPublicKey);
+        this.recipientPublicKey = Encoding.defaultPubKeyEncoding(recipientPublicKey);
+    }
+
     @Test
     @DisplayName("Ensure that correct transaction does not give validation errors")
     public void testValidTransaction_ExpectNoValidationErrors() throws Exception {
-        // create a test transaction object
-        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys("1".repeat(176), "0".repeat(176));
-        transaction.setTransactionHash("0".repeat(32));
+        final String fakeSignatureStr = "0".repeat(144);
+        final String fakeHashStr = "0".repeat(64);
 
-        final String fakeSignatureStr = "0".repeat(64);
+        // create a test transaction object
+        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(senderPublicKey, recipientPublicKey);
+        transaction.setTransactionHash(fakeHashStr);
 
         // for each transaction output, set fake signature
         for (TransactionOutput output : transaction.getOutputs())
@@ -48,7 +63,7 @@ public class TransactionValidationTests {
 
         // mock digestObject(), presumably used in TransactionHashConstraint
         given(asymmetricCryptographyService.digestObject(transaction))
-                .willReturn(Encoding.hexStringToBytes("0".repeat(32)));
+            .willReturn(Encoding.hexStringToBytes(fakeHashStr));
         // mock verifySignature(), presumably used in CryptographicSignatureConstraint
         given(asymmetricCryptographyService.verifyDigitalSignature(any(Serializable.class), any(), any()))
                 .willReturn(true);
@@ -61,18 +76,21 @@ public class TransactionValidationTests {
         TransactionHashConstraintValidator transactionHashConstraintValidator = new TransactionHashConstraintValidator(asymmetricCryptographyService);
         CryptographicSignatureConstraintValidator cryptographicSignatureConstraintValidator = new CryptographicSignatureConstraintValidator(asymmetricCryptographyService);
 
-        assertTrue(doubleSpendingConstraintValidator.isValid(transaction, null) &&
-                transactionHashConstraintValidator.isValid(transaction, null) &&
-                cryptographicSignatureConstraintValidator.isValid(transaction, null));
+        assertTrue(doubleSpendingConstraintValidator.isValid(transaction, null));
+        assertTrue(transactionHashConstraintValidator.isValid(transaction, null));
+        assertTrue(cryptographicSignatureConstraintValidator.isValid(transaction, null));
     }
 
     /* CryptographicSignatureConstraint violations */
     @Test
     @DisplayName("Ensure that validation error is given when signature is null")
-    public void testInvalidTransaction_NullSignature_ExpectCryptographicSignatureValidationError()  {
+    public void testInvalidTransaction_NullSignature_ExpectCryptographicSignatureValidationError() throws Exception {
         // create a test transaction object
-        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys("1".repeat(176), "0".repeat(176));
-        transaction.setTransactionHash("0".repeat(32));
+        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(senderPublicKey, recipientPublicKey);
+        transaction.setTransactionHash("0".repeat(64));
+
+        given(asymmetricCryptographyService.digestObject(transaction))
+            .willReturn(Encoding.hexStringToBytes("0".repeat(64)));
 
         CryptographicSignatureConstraintValidator cryptographicSignatureConstraintValidator = new CryptographicSignatureConstraintValidator(asymmetricCryptographyService);
         assertFalse(cryptographicSignatureConstraintValidator.isValid(transaction, null));
@@ -81,21 +99,22 @@ public class TransactionValidationTests {
     @Test
     @DisplayName("Ensure that validation error is given when signature is invalid")
     public void testInvalidTransaction_InvalidSignature_ExpectCryptographicSignatureValidationError() throws Exception {
+        final String fakeHashStr = "0".repeat(64);
+
         // create a test transaction object
-        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys("1".repeat(176), "0".repeat(176));
-        transaction.setTransactionHash("0".repeat(32));
+        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(senderPublicKey, recipientPublicKey);
+        transaction.setTransactionHash(fakeHashStr);
 
         // set some random signatures to outputs
         for (int i = 0; i < transaction.getOutputs().size(); i++) {
-            transaction.getOutputs().get(i).setSignature(("" + i).repeat(64));
+            transaction.getOutputs().get(i).setSignature(("" + i).repeat(144));
         }
 
         // mock digestObject(), presumably used in TransactionHashConstraint and CryptographicSignatureConstraint
         given(asymmetricCryptographyService.digestObject(transaction))
-                .willReturn(Encoding.hexStringToBytes("0".repeat(32)));
-        // mock verifySignature(), presumably used in CryptographicSignatureConstraint
+            .willReturn(Encoding.hexStringToBytes(fakeHashStr));
         given(asymmetricCryptographyService.verifyDigitalSignature(any(Serializable.class), any(), any()))
-                .willReturn(false);
+            .willReturn(false);
 
         CryptographicSignatureConstraintValidator cryptographicSignatureConstraintValidator = new CryptographicSignatureConstraintValidator(asymmetricCryptographyService);
         assertFalse(cryptographicSignatureConstraintValidator.isValid(transaction, null));
@@ -103,10 +122,14 @@ public class TransactionValidationTests {
 
     @Test
     @DisplayName("Ensure that exceptions are handled when malformed signature format is given")
-    public void testInvalidTransaction_MalformedSignature_ExpectNoExceptionsAndCryptographicSignatureValidationError() {
+    public void testInvalidTransaction_MalformedSignature_ExpectNoExceptionsAndCryptographicSignatureValidationError() throws Exception {
+        final String fakeHashStr = "0".repeat(64);
         // create a test transaction object
-        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys("1".repeat(176), "0".repeat(176));
-        transaction.setTransactionHash("0".repeat(32));
+        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(senderPublicKey, recipientPublicKey);
+        transaction.setTransactionHash(fakeHashStr);
+
+        given(asymmetricCryptographyService.digestObject(transaction))
+            .willReturn(Encoding.hexStringToBytes(fakeHashStr));
 
         // set malformed signatures to transaction outputs
         for (TransactionOutput output : transaction.getOutputs()) {
@@ -126,17 +149,17 @@ public class TransactionValidationTests {
     @Test
     @DisplayName("Ensure that reusing already used Transaction output as new Transaction's input gives DoubleSpendingConstraint error")
     public void testInvalidTransaction_DoubleSpending_ExpectDoubleSpendingConstraintError() {
-        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys("1".repeat(176), "0".repeat(176));
-        transaction.setTransactionHash("0".repeat(32));
+        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(senderPublicKey, recipientPublicKey);
+        transaction.setTransactionHash("0".repeat(64));
 
         // set random signatures
         for (TransactionOutput output : transaction.getOutputs()) {
-            output.setSignature("0".repeat(64));
+            output.setSignature("0".repeat(144));
         }
 
         // mock findUtxoCountBySignature(), presumably used in DoubleSpendingConstraint
         given(transactionOutputRepository.findUtxoCountBySignature(any()))
-                .willReturn(1);
+            .willReturn(1);
 
         DoubleSpendingConstraintValidator doubleSpendingConstraintValidator = new DoubleSpendingConstraintValidator(transactionOutputRepository);
         assertFalse(doubleSpendingConstraintValidator.isValid(transaction, null));
@@ -144,19 +167,22 @@ public class TransactionValidationTests {
 
     /* TransactionHashConstraint violations */
     @Test
-    @DisplayName("Ensure that TransactionHashConstraint error is given if calculated mismatch happens")
+    @DisplayName("Ensure that TransactionHashConstraint error is given if hash mismatch happens")
     public void testInvalidTransaction_MismatchingHashes_ExpectTransactionHashConstraintError() throws Exception {
-        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys("1".repeat(176), "0".repeat(176));
-        transaction.setTransactionHash("0".repeat(32));
+        final String fakeHashStr = "0".repeat(64);
+        final String calculatedHashStr = "1".repeat(64);
+
+        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(senderPublicKey, recipientPublicKey);
+        transaction.setTransactionHash(fakeHashStr);
 
         // set signatures
         for (TransactionOutput output : transaction.getOutputs()) {
-            output.setSignature("0".repeat(64));
+            output.setSignature("0".repeat(144));
         }
 
         // mock digestObject(), presumably used in TransactionHashConstraint
         given(asymmetricCryptographyService.digestObject(transaction))
-                .willReturn(Encoding.hexStringToBytes("1".repeat(32)));
+            .willReturn(Encoding.hexStringToBytes(calculatedHashStr));
 
         TransactionHashConstraintValidator transactionHashConstraintValidator = new TransactionHashConstraintValidator(asymmetricCryptographyService);
         assertFalse(transactionHashConstraintValidator.isValid(transaction, null));
@@ -165,11 +191,11 @@ public class TransactionValidationTests {
     @Test
     @DisplayName("Ensure that TransactionHashConstraint error is given and no exceptions thrown when specified transaction hash is null")
     public void testInvalidTransaction_NullHash_ExpectTransactionHashConstraintErrorDoesNotThrow() {
-        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys("1".repeat(176), "0".repeat(176));
+        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(senderPublicKey, recipientPublicKey);
 
         // set random signatures
         for (TransactionOutput output : transaction.getOutputs()) {
-            output.setSignature("0".repeat(64));
+            output.setSignature("0".repeat(144));
         }
 
         TransactionHashConstraintValidator transactionHashConstraintValidator = new TransactionHashConstraintValidator(asymmetricCryptographyService);
