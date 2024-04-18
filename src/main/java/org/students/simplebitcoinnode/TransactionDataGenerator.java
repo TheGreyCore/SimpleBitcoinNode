@@ -43,7 +43,7 @@ public class TransactionDataGenerator implements CommandLineRunner {
     public void run(String... args) throws Exception {
         Logger logger = Logger.getLogger(TransactionDataGenerator.class.getName());
 
-        if (args.length < 4 || !args[0].equals("seed"))
+        if (args.length < 4 || !args[0].equals("seed-transactions"))
             return;
 
         logger.info("Running pseudo-data generating");

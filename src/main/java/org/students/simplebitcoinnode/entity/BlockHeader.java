@@ -40,7 +40,7 @@ public class BlockHeader implements Externalizable {
     @Length(min = 64, max = 64)
     private String merkleTreeRoot;
 
-    private LocalDateTime blockConstructTimestamp = LocalDateTime.now(ZoneId.of("UTC"));
+    private LocalDateTime blockAssemblyTimestamp = LocalDateTime.now(ZoneId.of("UTC"));
 
     // in case this is set to NULL, the block hasn't been mined yet
     private LocalDateTime minedTimestamp;
@@ -57,6 +57,7 @@ public class BlockHeader implements Externalizable {
         try {
             out.write(Encoding.hexStringToBytes(previousHash));
             out.write(Encoding.hexStringToBytes(merkleTreeRoot));
+            out.writeObject(blockAssemblyTimestamp);
             byte[] nonceBytes = nonce.toByteArray();
             out.write(nonceBytes.length);
             out.write(nonceBytes);
