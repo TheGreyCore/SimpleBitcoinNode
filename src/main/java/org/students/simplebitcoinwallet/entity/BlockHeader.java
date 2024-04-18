@@ -21,6 +21,9 @@ public class BlockHeader implements Externalizable {
     @Serial
     private static final long serialVersionUID = 0x010000L;
 
+    // how many zero bits does the hash need to have in order for the block to be considered mined
+    private static final long mineCondition = 8;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

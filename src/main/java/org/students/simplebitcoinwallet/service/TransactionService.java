@@ -33,8 +33,7 @@ public class TransactionService {
         return switch (type) {
             case "sent" -> transactionRepository.findSentTransactionsByPublicKeyAddress(pubKey);
             case "received" -> transactionRepository.findReceivedTransactionsExcludeReturns(pubKey);
-            case "all" -> transactionRepository.findAllTransactionsByPublicKeyAddress(pubKey);
-            default -> null;
+            default -> transactionRepository.findAllTransactionsByPublicKeyAddress(pubKey);
         };
     }
 
@@ -47,14 +46,14 @@ public class TransactionService {
      */
     
     public int newTransactions(Transaction transaction) {
-        //try {
-        // TransactionRepository.save() call fails if the entity is annotated with custom constraints that have dependencies
-        // Is there a way to avoid validation in save() calls because the validation would be done in the endpoint controller anyway?
-        transactionRepository.save(transaction);
-        /*} catch (Exception e){
+        try {
+            // TransactionRepository.save() call fails if the entity is annotated with custom constraints that have dependencies
+            // Is there a way to avoid validation in save() calls because the validation would be done in the endpoint controller anyway?
+            transactionRepository.save(transaction);
+        } catch (Exception e){
             logger.warning(e.getMessage());
             return 400;
-        }*/
-        return 201;
+        }
+        return 200;
     }
 }

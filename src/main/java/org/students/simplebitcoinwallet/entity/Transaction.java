@@ -23,6 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "ledger")
+
 // These are the problematic ConstraintValidator annotations which cause problems when saving transactions into JpaRepository
 @TransactionHashConstraint
 @DoubleSpendingConstraint

@@ -6,7 +6,6 @@ import org.students.simplebitcoinwallet.entity.validation.TransactionHashConstra
 
 import java.lang.annotation.*;
 
-@Documented
 @Constraint(validatedBy = TransactionHashConstraintValidator.class)
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
