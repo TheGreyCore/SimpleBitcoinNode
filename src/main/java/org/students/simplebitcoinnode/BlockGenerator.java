@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 
 @SpringBootApplication
 public class BlockGenerator implements CommandLineRunner {
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(BlockGenerator.class);
     // injected dependencies
     private final BlockHeaderRepository blockHeaderRepository;
     private final MerkleTreeNodeRepository merkleTreeNodeRepository;

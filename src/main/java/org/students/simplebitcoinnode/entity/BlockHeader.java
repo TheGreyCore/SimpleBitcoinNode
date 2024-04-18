@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 @Entity
-@Table(name = "blocks")
+@Table(name = "BLOCKS")
 @Setter
 @Getter
 @NoArgsConstructor

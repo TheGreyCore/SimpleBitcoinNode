@@ -62,7 +62,7 @@ public class TransactionDataGenerator implements CommandLineRunner {
     /**
      * Create the very first transaction output (aka mint tokens into circulation)
      * @param satoshiWallet specifies a keypair of the very first wallet holding all tokens in circulation
-     * @return
+     * @return TransactionOutput specifying the initial UTXO of so-called Satoshi wallet
      */
     private TransactionOutput makeSatoshiUTXO(KeyPair satoshiWallet) {
         return TransactionOutput.builder()
@@ -76,7 +76,6 @@ public class TransactionDataGenerator implements CommandLineRunner {
      * Generate random transactions according to specified parameters.<br>
      * The transaction generation algorithm works by constructing a tree from generated transactions.
      * Initially, Satoshi holds some amount of tokens, of which most of it he sends to N other wallets and those N wallets send to other N wallets and so on.
-     * @throws Exception
      */
     private void generateTransactions() throws Exception {
         // generate the initial seed TransactionOutput (aka mint some coins into the circulation)
@@ -126,7 +125,6 @@ public class TransactionDataGenerator implements CommandLineRunner {
      * @param receiverKeys receiver's wallet keypair
      * @param sum total sum of tokens to send to receiver's address
      * @return transaction object specifies the transaction constructed from given arguments
-     * @throws Exception
      */
     private Transaction createNewTransaction(List<TransactionOutput> inputs, KeyPair senderKeys, KeyPair receiverKeys, BigDecimal sum) throws Exception {
         // calculate the amount of change that needs to be returned to the sender
