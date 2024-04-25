@@ -1,0 +1,1 @@
+GET http://localhost:8080/blockchain/transactions?pubKey=PZ8Tyr4Nx8MHsRAGMpZmZ6TWY63dXWSCwaXBRYUfimKYY74i3QDYj6Y2rFgb6tGHmMNUGZssGx71FB1M2KnDMugTE2h6N8ttkpxSrT7arsC4Lqum3zrkF3oJ&type=sent
