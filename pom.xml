@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>org.students</groupId>
-    <artifactId>simpleBitcoinWallet</artifactId>
+    <artifactId>SimpleBitcoinNode</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>simpleBitcoinWallet</name>
-    <description>simpleBitcoinWallet</description>
+    <name>SimpleBitcoinNode</name>
+    <description>SimpleBitcoinNode</description>
     <properties>
         <java.version>21</java.version>
     </properties>
@@ -85,6 +85,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>org.students.simplebitcoinnode.SimpleBitcoinNodeApplication</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>
