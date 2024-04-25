@@ -1,14 +1,11 @@
 package org.students.simplebitcoinwallet.service;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.students.simplebitcoinwallet.dataTransferObjects.GetTransactionDTO;
 import org.students.simplebitcoinwallet.dataTransferObjects.NewTransactionDTO;
-import org.students.simplebitcoinwallet.dataTransferObjects.TransactionOutputDTO;
 import org.students.simplebitcoinwallet.entity.Transaction;
 import org.students.simplebitcoinwallet.repository.TransactionRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
