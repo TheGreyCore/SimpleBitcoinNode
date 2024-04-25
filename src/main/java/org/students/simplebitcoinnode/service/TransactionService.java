@@ -1,20 +1,22 @@
 package org.students.simplebitcoinnode.service;
 
 import org.springframework.stereotype.Service;
+import org.students.simplebitcoinnode.dataTransferObjects.GetTransactionDTO;
+import org.students.simplebitcoinnode.dataTransferObjects.NewTransactionDTO;
 import org.students.simplebitcoinnode.entity.Transaction;
 import org.students.simplebitcoinnode.repository.TransactionRepository;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 @Service
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
-    private final Logger logger = Logger.getLogger(TransactionService.class.getName());
+    private final DTOMapperService dtoMapperService;
 
-    public TransactionService(TransactionRepository transactionRepository) {
+    public TransactionService(TransactionRepository transactionRepository, DTOMapperService dtoMapperService) {
         this.transactionRepository = transactionRepository;
+        this.dtoMapperService = dtoMapperService;
     }
 
     /**
@@ -29,13 +31,22 @@ public class TransactionService {
      * @throws IllegalArgumentException if the provided public key is null or empty.
      * @throws IllegalArgumentException if the provided type is null or empty.
      */
-    public List<Transaction> getTransactions(String pubKey, String type) {
+    public List<GetTransactionDTO> getTransactions(String pubKey, String type) {
+        List<Transaction> transactions;
         return switch (type) {
-            case "sent" -> transactionRepository.findSentTransactionsByPublicKeyAddress(pubKey);
-            case "received" -> transactionRepository.findReceivedTransactionsExcludeReturns(pubKey);
-            default -> transactionRepository.findAllTransactionsByPublicKeyAddress(pubKey);
+            case "sent":
+                transactions = transactionRepository.findSentTransactionsByPublicKeyAddress(pubKey);
+                yield dtoMapperService.mapAll(transactions, GetTransactionDTO.class);
+            case "received":
+                transactions = transactionRepository.findAllReceivedTransactionsByPublicKeyAddress(pubKey);
+                yield dtoMapperService.mapAll(transactions, GetTransactionDTO.class);
+            case "all":
+                transactions = transactionRepository.findAllTransactionsByPublicKeyAddress(pubKey);
+                yield dtoMapperService.mapAll(transactions, GetTransactionDTO.class);
+            default: yield null;
         };
     }
+
 
     /**
      * This method is used to save new transactions.
@@ -45,15 +56,12 @@ public class TransactionService {
      *             It returns 201 if the transaction was successfully created, and 400 if an exception occurred.
      */
     
-    public int newTransactions(Transaction transaction) {
+    public int newTransactions(NewTransactionDTO newTransactionDTO) {
         try {
-            // TransactionRepository.save() call fails if the entity is annotated with custom constraints that have dependencies
-            // Is there a way to avoid validation in save() calls because the validation would be done in the endpoint controller anyway?
-            transactionRepository.save(transaction);
+            transactionRepository.save(dtoMapperService.unmap(newTransactionDTO, Transaction.class));
         } catch (Exception e){
-            logger.warning(e.getMessage());
             return 400;
         }
-        return 200;
+        return 201;
     }
 }
