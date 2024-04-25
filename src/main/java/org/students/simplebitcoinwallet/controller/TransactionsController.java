@@ -5,12 +5,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.students.simplebitcoinwallet.dataTransferObjects.GetTransactionDTO;
+import org.students.simplebitcoinwallet.dataTransferObjects.NewTransactionDTO;
 import org.students.simplebitcoinwallet.entity.Transaction;
 import org.students.simplebitcoinwallet.representation.BadRequestErrorResponse;
 import org.students.simplebitcoinwallet.representation.ValidationErrorResponse;
 import org.students.simplebitcoinwallet.service.TransactionService;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,6 @@ import java.util.logging.Logger;
 @RequestMapping("/blockchain")
 public class TransactionsController {
     private final TransactionService transactionService;
-
     Logger logger = Logger.getLogger(TransactionsController.class.getName());
 
     public TransactionsController(TransactionService transactionService) {
@@ -40,20 +40,20 @@ public class TransactionsController {
      * @throws IllegalArgumentException if the provided type is null or empty.
      */
     @GetMapping("/transactions")
-    public List<Transaction> getTransactions(@RequestParam String pubKey, @RequestParam String type) {
-        return transactionService.getTransactions(pubKey, type);
+    public ResponseEntity<List<GetTransactionDTO>> getTransactions(@RequestParam String pubKey, @RequestParam String type) {
+        return ResponseEntity.ok().body(transactionService.getTransactions(pubKey, type));
     }
 
     /**
      * This method is used to create new transactions.
      *
-     * @param transaction This is the transaction to be created.
+     * @param newTransactionDTO This is the transaction to be created.
      * @return returns the result of the transaction creation.
      */
     @Valid
     @PostMapping("/send")
-    public ResponseEntity<?> newTransactions(@RequestParam Transaction transaction){
-        return ResponseEntity.ok().body(transactionService.newTransactions(transaction));
+    public ResponseEntity<Integer> newTransactions(@RequestParam NewTransactionDTO newTransactionDTO){
+        return ResponseEntity.ok().body(transactionService.newTransactions(newTransactionDTO));
     }
 
     /**
@@ -74,6 +74,4 @@ public class TransactionsController {
         });
         return ResponseEntity.badRequest().body(new ValidationErrorResponse(errors));
     }
-
-
 }

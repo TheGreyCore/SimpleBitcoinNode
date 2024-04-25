@@ -1,20 +1,25 @@
 package org.students.simplebitcoinwallet.service;
 
-import org.springframework.http.ResponseEntity;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.students.simplebitcoinwallet.dataTransferObjects.GetTransactionDTO;
+import org.students.simplebitcoinwallet.dataTransferObjects.NewTransactionDTO;
+import org.students.simplebitcoinwallet.dataTransferObjects.TransactionOutputDTO;
 import org.students.simplebitcoinwallet.entity.Transaction;
 import org.students.simplebitcoinwallet.repository.TransactionRepository;
 
-import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
+    private final DTOMapperService dtoMapperService;
 
-    public TransactionService(TransactionRepository transactionRepository) {
+    public TransactionService(TransactionRepository transactionRepository, DTOMapperService dtoMapperService) {
         this.transactionRepository = transactionRepository;
+        this.dtoMapperService = dtoMapperService;
     }
 
     /**
@@ -29,14 +34,22 @@ public class TransactionService {
      * @throws IllegalArgumentException if the provided public key is null or empty.
      * @throws IllegalArgumentException if the provided type is null or empty.
      */
-    public List<Transaction> getTransactions(String pubKey, String type) {
+    public List<GetTransactionDTO> getTransactions(String pubKey, String type) {
+        List<Transaction> transactions;
         return switch (type) {
-            case "sent" -> transactionRepository.findSentTransactionsByPublicKeyAddress(pubKey);
-            case "received" -> transactionRepository.findAllReceivedTransactionsByPublicKeyAddress(pubKey);
-            case "all" -> transactionRepository.findAllTransactionsByPublicKeyAddress(pubKey);
-            default -> null;
+            case "sent":
+                transactions = transactionRepository.findSentTransactionsByPublicKeyAddress(pubKey);
+                yield dtoMapperService.mapAll(transactions, GetTransactionDTO.class);
+            case "received":
+                transactions = transactionRepository.findAllReceivedTransactionsByPublicKeyAddress(pubKey);
+                yield dtoMapperService.mapAll(transactions, GetTransactionDTO.class);
+            case "all":
+                transactions = transactionRepository.findAllTransactionsByPublicKeyAddress(pubKey);
+                yield dtoMapperService.mapAll(transactions, GetTransactionDTO.class);
+            default: yield null;
         };
     }
+
 
     /**
      * This method is used to save new transactions.
@@ -46,9 +59,9 @@ public class TransactionService {
      *             It returns 201 if the transaction was successfully created, and 400 if an exception occurred.
      */
     
-    public int newTransactions(Transaction transaction) {
+    public int newTransactions(NewTransactionDTO newTransactionDTO) {
         try {
-            transactionRepository.save(transaction);
+            transactionRepository.save(dtoMapperService.unmap(newTransactionDTO, Transaction.class));
         } catch (Exception e){
             return 400;
         }
