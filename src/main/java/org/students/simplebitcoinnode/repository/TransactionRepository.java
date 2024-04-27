@@ -19,7 +19,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
 
     /**
      * Find all transactions where given wallet's public key has received some tokens including return transfers
-     * @param publicKey specfies the wallet's public key to use for querying
+     * @param publicKey specifies the wallet's public key to use for querying
      * @return list of transactions matching the criteria
      */
     @Query(value = "SELECT l.* FROM LEDGER l JOIN TRANSACTION_OUTPUT t ON l.id=t.OUTPUT_ID WHERE t.RECEIVER_PUBLIC_KEY=?1", nativeQuery = true)
@@ -50,7 +50,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
         SELECT * FROM LEDGER l
         WHERE l.ID NOT IN (
             SELECT TRANSACTION_ID FROM INTERMEDIATE_MERKLE_TREE_NODES
-            WHERE TRANSACTION_ID != null
+            WHERE TRANSACTION_ID IS NOT NULL
         )
         ORDER BY TIMESTAMP
         LIMIT ?1
