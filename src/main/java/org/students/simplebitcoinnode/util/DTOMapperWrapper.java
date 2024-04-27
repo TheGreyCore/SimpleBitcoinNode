@@ -1,4 +1,4 @@
-package org.students.simplebitcoinnode.service;
+package org.students.simplebitcoinnode.util;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class DTOMapperService {
+public class DTOMapperWrapper {
     private final ModelMapper mapper = new ModelMapper();
 
     /**

@@ -1,10 +1,11 @@
 package org.students.simplebitcoinnode.service;
 
 import org.springframework.stereotype.Service;
-import org.students.simplebitcoinnode.dataTransferObjects.GetTransactionDTO;
-import org.students.simplebitcoinnode.dataTransferObjects.NewTransactionDTO;
+import org.students.simplebitcoinnode.datatransferobjects.GetTransactionDTO;
+import org.students.simplebitcoinnode.datatransferobjects.NewTransactionDTO;
 import org.students.simplebitcoinnode.entity.Transaction;
 import org.students.simplebitcoinnode.repository.TransactionRepository;
+import org.students.simplebitcoinnode.util.DTOMapperWrapper;
 
 import java.util.List;
 
@@ -12,11 +13,11 @@ import java.util.List;
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
-    private final DTOMapperService dtoMapperService;
+    private final DTOMapperWrapper dtoMapperWrapper;
 
-    public TransactionService(TransactionRepository transactionRepository, DTOMapperService dtoMapperService) {
+    public TransactionService(TransactionRepository transactionRepository, DTOMapperWrapper dtoMapperWrapper) {
         this.transactionRepository = transactionRepository;
-        this.dtoMapperService = dtoMapperService;
+        this.dtoMapperWrapper = dtoMapperWrapper;
     }
 
     /**
@@ -36,13 +37,13 @@ public class TransactionService {
         return switch (type) {
             case "sent":
                 transactions = transactionRepository.findSentTransactionsByPublicKeyAddress(pubKey);
-                yield dtoMapperService.mapAll(transactions, GetTransactionDTO.class);
+                yield dtoMapperWrapper.mapAll(transactions, GetTransactionDTO.class);
             case "received":
                 transactions = transactionRepository.findAllReceivedTransactionsByPublicKeyAddress(pubKey);
-                yield dtoMapperService.mapAll(transactions, GetTransactionDTO.class);
+                yield dtoMapperWrapper.mapAll(transactions, GetTransactionDTO.class);
             case "all":
                 transactions = transactionRepository.findAllTransactionsByPublicKeyAddress(pubKey);
-                yield dtoMapperService.mapAll(transactions, GetTransactionDTO.class);
+                yield dtoMapperWrapper.mapAll(transactions, GetTransactionDTO.class);
             default: yield null;
         };
     }
@@ -51,17 +52,13 @@ public class TransactionService {
     /**
      * This method is used to save new transactions.
      *
-     * @param transaction This is the transaction to be created.
+     * @param newTransactionDTO This is the transaction to be created.
      * @return int This returns the HTTP status code of the transaction creation operation.
      *             It returns 201 if the transaction was successfully created, and 400 if an exception occurred.
      */
     
-    public int newTransactions(NewTransactionDTO newTransactionDTO) {
-        try {
-            transactionRepository.save(dtoMapperService.unmap(newTransactionDTO, Transaction.class));
-        } catch (Exception e){
-            return 400;
-        }
-        return 201;
+    public GetTransactionDTO newTransactions(NewTransactionDTO newTransactionDTO) {
+        Transaction Transaction = transactionRepository.save(dtoMapperWrapper.unmap(newTransactionDTO, org.students.simplebitcoinnode.entity.Transaction.class));
+        return dtoMapperWrapper.map(Transaction, GetTransactionDTO.class);
     }
 }

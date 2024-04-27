@@ -5,8 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import org.students.simplebitcoinnode.dataTransferObjects.GetTransactionDTO;
-import org.students.simplebitcoinnode.dataTransferObjects.NewTransactionDTO;
+import org.students.simplebitcoinnode.datatransferobjects.GetTransactionDTO;
+import org.students.simplebitcoinnode.datatransferobjects.NewTransactionDTO;
 import org.students.simplebitcoinnode.representation.BadRequestErrorResponse;
 import org.students.simplebitcoinnode.representation.ValidationErrorResponse;
 import org.students.simplebitcoinnode.service.TransactionService;
@@ -49,9 +49,8 @@ public class TransactionsController {
      * @param newTransactionDTO This is the transaction to be created.
      * @return returns the result of the transaction creation.
      */
-    @Valid
     @PostMapping("/send")
-    public ResponseEntity<Integer> newTransactions(@RequestParam NewTransactionDTO newTransactionDTO){
+    public ResponseEntity<GetTransactionDTO> newTransactions(@Valid @RequestBody NewTransactionDTO newTransactionDTO){
         return ResponseEntity.ok().body(transactionService.newTransactions(newTransactionDTO));
     }
 
