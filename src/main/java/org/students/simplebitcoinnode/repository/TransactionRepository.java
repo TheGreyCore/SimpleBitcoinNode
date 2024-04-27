@@ -40,4 +40,20 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
      */
     @Query(value = "SELECT DISTINCT l.* FROM LEDGER l JOIN TRANSACTION_OUTPUT t on l.ID=t.OUTPUT_ID WHERE t.RECEIVER_PUBLIC_KEY=?1 OR l.SENDER_PUBLIC_KEY=?1", nativeQuery = true)
     List<Transaction> findAllTransactionsByPublicKeyAddress(String publicKey);
+
+    /**
+     * Queries N unverified transactions (i.e. not belonging to any merkle tree) ordered by timestamp
+     * @param limit specifies the maximum amount of transactions to query for
+     * @return list containing at max N unverified transactions
+     */
+    @Query(value = """
+        SELECT * FROM LEDGER l
+        WHERE l.ID NOT IN (
+            SELECT TRANSACTION_ID FROM INTERMEDIATE_MERKLE_TREE_NODES
+            WHERE TRANSACTION_ID != null
+        )
+        ORDER BY TIMESTAMP
+        LIMIT ?1
+    """, nativeQuery = true)
+    List<Transaction> findUnverifiedTransactionsLimitByN(int limit);
 }
