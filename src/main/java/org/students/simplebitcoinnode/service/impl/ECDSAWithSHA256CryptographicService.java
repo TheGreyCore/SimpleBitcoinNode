@@ -38,9 +38,6 @@ public class ECDSAWithSHA256CryptographicService extends AsymmetricCryptographyS
      * @param signature specifies the signature itself as a byte array
      * @param pubKey specifies the signer's public key
      * @return a boolean value with either true, if signature verification was successful, or false otherwise
-     * @throws SerializationException
-     * @throws MalformedKeyException
-     * @throws MalformedSignatureException
      */
     @Override
     public boolean verifyDigitalSignature(Serializable messageObject, byte[] signature, byte[] pubKey) throws SerializationException, MalformedKeyException, MalformedSignatureException {
@@ -90,8 +87,6 @@ public class ECDSAWithSHA256CryptographicService extends AsymmetricCryptographyS
      * @param messageObject specifies the message object to sign
      * @param privateKey specifies an array of bytes encoded in implementation specific manner
      * @return array of bytes containing the digital signature
-     * @throws SerializationException
-     * @throws MalformedKeyException
      */
     @Override
     public byte[] signMessage(Serializable messageObject, byte[] privateKey) throws SerializationException, MalformedKeyException {

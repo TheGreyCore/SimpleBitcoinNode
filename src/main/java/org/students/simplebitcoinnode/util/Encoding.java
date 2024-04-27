@@ -26,7 +26,6 @@ public class Encoding {
      * Decodes the provided public key with current default public key decoding algorithm
      * @param encodedPublicKey represents the encoded public key as string
      * @return byte array representing the public key
-     * @throws InvalidEncodedStringException
      */
     public static byte[] defaultPubKeyDecoding(String encodedPublicKey) throws InvalidEncodedStringException {
         return base58Decode(encodedPublicKey);
