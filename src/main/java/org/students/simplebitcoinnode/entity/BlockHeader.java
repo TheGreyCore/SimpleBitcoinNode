@@ -40,6 +40,7 @@ public class BlockHeader implements Externalizable {
     @Length(min = 64, max = 64)
     private String merkleTreeRoot;
 
+    @Builder.Default
     private LocalDateTime blockAssemblyTimestamp = LocalDateTime.now(ZoneId.of("UTC"));
 
     // in case this is set to NULL, the block hasn't been mined yet

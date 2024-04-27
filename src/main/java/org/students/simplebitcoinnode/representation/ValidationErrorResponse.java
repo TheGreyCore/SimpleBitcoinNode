@@ -8,13 +8,13 @@ import java.util.Map;
 public class ValidationErrorResponse extends BadRequestErrorResponse {
     @Setter
     @Getter
-    private Map<String, String> invalidFields;
+    private Map<String, String> invalidObjects;
     public ValidationErrorResponse() {
         super("Request body validation failed");
     }
 
-    public ValidationErrorResponse(Map<String, String> invalidFields) {
+    public ValidationErrorResponse(Map<String, String> invalidObjects) {
         super("Request body validation failed");
-        this.invalidFields = invalidFields;
+        this.invalidObjects = invalidObjects;
     }
 }

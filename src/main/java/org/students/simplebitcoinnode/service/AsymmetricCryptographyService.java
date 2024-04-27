@@ -24,7 +24,6 @@ public abstract class AsymmetricCryptographyService {
      * Digests given messageObject and returns its calculated hash. The specific hashing algorithm is implementation dependent
      * @param messageObject specifies the object to use as a message for hashing
      * @return byte array containing the calculated hash
-     * @throws SerializationException
      */
     public abstract byte[] digestObject(Serializable messageObject) throws SerializationException;
 
@@ -34,9 +33,6 @@ public abstract class AsymmetricCryptographyService {
      * @param signature specifies the signature itself as a byte array
      * @param pubKey specifies the signer's public key
      * @return a boolean value with either true, if signature verification was successful, or false otherwise
-     * @throws SerializationException
-     * @throws MalformedKeyException
-     * @throws MalformedSignatureException
      */
     public abstract boolean verifyDigitalSignature(Serializable messageObject, byte[] signature, byte[] pubKey) throws SerializationException, MalformedKeyException, MalformedSignatureException;
 
@@ -51,8 +47,6 @@ public abstract class AsymmetricCryptographyService {
      * @param messageObject specifies the message object to sign
      * @param privateKey specifies an array of bytes encoded in implementation specific manner
      * @return array of bytes containing the digital signature
-     * @throws SerializationException
-     * @throws MalformedKeyException
      */
     public abstract byte[] signMessage(Serializable messageObject, byte[] privateKey) throws SerializationException, MalformedKeyException;
 
@@ -60,7 +54,6 @@ public abstract class AsymmetricCryptographyService {
      * Serialize given object into byte array
      * @param serializable specifies the object to serialize
      * @return serialized object's byte array
-     * @throws SerializationException
      */
     protected byte[] byteSerialize(Serializable serializable) throws SerializationException {
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

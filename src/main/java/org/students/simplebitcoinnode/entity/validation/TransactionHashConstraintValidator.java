@@ -3,7 +3,7 @@ package org.students.simplebitcoinnode.entity.validation;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.students.simplebitcoinnode.entity.Transaction;
+import org.students.simplebitcoinnode.dto.TransactionDTO;
 import org.students.simplebitcoinnode.entity.validation.annotations.TransactionHashConstraint;
 import org.students.simplebitcoinnode.exceptions.encoding.SerializationException;
 import org.students.simplebitcoinnode.service.AsymmetricCryptographyService;
@@ -34,7 +34,8 @@ import java.util.logging.Logger;
  *     <li>UTC timestamp, when the transaction was made (encoded as <code>LocalDateTime</code>)</li>
  * </ul>
  */
-public class TransactionHashConstraintValidator implements ConstraintValidator<TransactionHashConstraint, Transaction> {
+public class TransactionHashConstraintValidator
+        implements ConstraintValidator<TransactionHashConstraint, TransactionDTO> {
     private final AsymmetricCryptographyService asymmetricCryptographyService;
     private final Logger logger = Logger.getLogger(TransactionHashConstraintValidator.class.getName());
 
@@ -49,7 +50,7 @@ public class TransactionHashConstraintValidator implements ConstraintValidator<T
     }
 
     @Override
-    public boolean isValid(Transaction transaction, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(TransactionDTO transaction, ConstraintValidatorContext constraintValidatorContext) {
         // null value checks
         if (transaction == null)
             return false;

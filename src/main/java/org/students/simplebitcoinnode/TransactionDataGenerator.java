@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Profile;
 import org.students.simplebitcoinnode.entity.Transaction;
 import org.students.simplebitcoinnode.entity.TransactionOutput;
 import org.students.simplebitcoinnode.repository.TransactionRepository;
@@ -16,9 +17,10 @@ import java.security.KeyPair;
 import java.security.Security;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.logging.Logger;
 import java.util.*;
+import java.util.logging.Logger;
 
+@Profile("TransactionDataGenerator")
 @SpringBootApplication
 public class TransactionDataGenerator implements CommandLineRunner {
     // injected dependencies
@@ -43,20 +45,24 @@ public class TransactionDataGenerator implements CommandLineRunner {
     public void run(String... args) throws Exception {
         Logger logger = Logger.getLogger(TransactionDataGenerator.class.getName());
 
-        if (args.length < 4 || !args[0].equals("seed-transactions"))
-            return;
+        if (args.length < 3) {
+            System.err.println("Usage: simple-bitcoin-wallet -Dspring.profiles.active=TransactionDataGenerator <circulation> <max-recipients-per-wallet> <max-tree-depth>");
+            System.exit(1);
+        }
 
-        logger.info("Running pseudo-data generating");
+        logger.info("Running pseudo-data generation");
         // generation variables
         logger.info("Starting transaction data generation");
-        this.initialCirculation = new BigDecimal(args[1]);
-        this.maxRecipientsFromWallet = Integer.parseInt(args[2]);
-        this.maxTreeDepth = Integer.parseInt(args[3]);
+        this.initialCirculation = new BigDecimal(args[0]);
+        this.maxRecipientsFromWallet = Integer.parseInt(args[1]);
+        this.maxTreeDepth = Integer.parseInt(args[2]);
 
         generateTransactions();
         logger.info("Finished transaction data generation");
         logger.info("Saving transaction data into TransactionRepository");
         transactionRepository.saveAll(transactions);
+
+        System.exit(0);
     }
 
     /**
