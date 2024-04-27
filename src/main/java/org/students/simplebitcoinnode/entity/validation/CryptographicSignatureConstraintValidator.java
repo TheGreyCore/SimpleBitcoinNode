@@ -3,8 +3,8 @@ package org.students.simplebitcoinnode.entity.validation;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.students.simplebitcoinnode.entity.Transaction;
-import org.students.simplebitcoinnode.entity.TransactionOutput;
+import org.students.simplebitcoinnode.dto.TransactionDTO;
+import org.students.simplebitcoinnode.dto.TransactionOutputDTO;
 import org.students.simplebitcoinnode.entity.validation.annotations.CryptographicSignatureConstraint;
 import org.students.simplebitcoinnode.exceptions.crypto.MalformedKeyException;
 import org.students.simplebitcoinnode.exceptions.crypto.MalformedSignatureException;
@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  * The message whose signature is checked is constructed from the transaction hash and receiver's public key as illustrated below: <br>
  *   [HASH] + [RECEIVER_PUBKEY]<br>
  */
-public class CryptographicSignatureConstraintValidator implements ConstraintValidator<CryptographicSignatureConstraint, Transaction> {
+public class CryptographicSignatureConstraintValidator implements ConstraintValidator<CryptographicSignatureConstraint, TransactionDTO> {
     private final AsymmetricCryptographyService asymmetricCryptographyService;
     private final Logger logger = Logger.getLogger(CryptographicSignatureConstraintValidator.class.getName());
 
@@ -35,14 +35,14 @@ public class CryptographicSignatureConstraintValidator implements ConstraintVali
     }
 
     @Override
-    public boolean isValid(Transaction transaction, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(TransactionDTO transaction, ConstraintValidatorContext constraintValidatorContext) {
         // null value checks
         if (transaction == null)
             return false;
 
         // for each transaction output verify its signature
         try {
-            for (TransactionOutput transactionOutput : transaction.getOutputs()) {
+            for (TransactionOutputDTO transactionOutput : transaction.getOutputs()) {
                 // null signatures get invalidated
                 if (transactionOutput.getSignature() == null)
                     return false;

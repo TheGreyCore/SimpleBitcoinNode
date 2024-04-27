@@ -2,17 +2,14 @@ package org.students.simplebitcoinnode.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import org.students.simplebitcoinnode.datatransferobjects.GetTransactionDTO;
-import org.students.simplebitcoinnode.datatransferobjects.NewTransactionDTO;
+import org.students.simplebitcoinnode.dto.TransactionDTO;
 import org.students.simplebitcoinnode.representation.BadRequestErrorResponse;
 import org.students.simplebitcoinnode.representation.ValidationErrorResponse;
 import org.students.simplebitcoinnode.service.TransactionService;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -39,19 +36,19 @@ public class TransactionsController {
      * @throws IllegalArgumentException if the provided type is null or empty.
      */
     @GetMapping("/transactions")
-    public ResponseEntity<List<GetTransactionDTO>> getTransactions(@RequestParam String pubKey, @RequestParam String type) {
+    public ResponseEntity<?> getTransactions(@RequestParam String pubKey, @RequestParam String type) {
         return ResponseEntity.ok().body(transactionService.getTransactions(pubKey, type));
     }
 
     /**
      * This method is used to create new transactions.
      *
-     * @param newTransactionDTO This is the transaction to be created.
+     * @param transactionDTO This is the transaction to be created.
      * @return returns the result of the transaction creation.
      */
     @PostMapping("/send")
-    public ResponseEntity<GetTransactionDTO> newTransactions(@Valid @RequestBody NewTransactionDTO newTransactionDTO){
-        return ResponseEntity.ok().body(transactionService.newTransactions(newTransactionDTO));
+    public ResponseEntity<?> newTransactions(@Valid @RequestBody TransactionDTO transactionDTO){
+        return ResponseEntity.ok().body(transactionService.newTransactions(transactionDTO));
     }
 
     /**
@@ -66,9 +63,9 @@ public class TransactionsController {
 
         Map<String, String> errors = new HashMap<>();
         e.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldError = ((FieldError)error).getField();
+            String objectName = error.getObjectName();
             String errorMessage = error.getDefaultMessage();
-            errors.put(fieldError, errorMessage);
+            errors.put(objectName, errorMessage);
         });
         return ResponseEntity.badRequest().body(new ValidationErrorResponse(errors));
     }

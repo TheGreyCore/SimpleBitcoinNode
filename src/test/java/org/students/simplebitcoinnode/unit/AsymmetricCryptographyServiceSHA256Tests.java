@@ -5,7 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.students.simplebitcoinnode.exceptions.encoding.SerializationException;
 import org.students.simplebitcoinnode.util.Encoding;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public abstract class AsymmetricCryptographyServiceSHA256Tests extends AsymmetricCryptographyServiceTests {
     @Test

@@ -2,7 +2,7 @@ package org.students.simplebitcoinnode.unit;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.students.simplebitcoinnode.entity.Transaction;
+import org.students.simplebitcoinnode.dto.TransactionDTO;
 import org.students.simplebitcoinnode.service.AsymmetricCryptographyService;
 import org.students.simplebitcoinnode.unit.transaction.TestTransactionBuilder;
 import org.students.simplebitcoinnode.util.Encoding;
@@ -32,7 +32,7 @@ public abstract class AsymmetricCryptographyServiceTests {
     public void testTransactionSignatureVerification_ValidSignature_DoesNotThrow() {
         // key pair acts as our "wallet"
         KeyPair keyPair = asymmetricCryptographyService.generateNewKeypair();
-        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(Encoding.defaultPubKeyEncoding(keyPair.getPublic().getEncoded()), "1".repeat(64));
+        TransactionDTO transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(Encoding.defaultPubKeyEncoding(keyPair.getPublic().getEncoded()), "1".repeat(64));
 
         // the transaction is hashed
         try {

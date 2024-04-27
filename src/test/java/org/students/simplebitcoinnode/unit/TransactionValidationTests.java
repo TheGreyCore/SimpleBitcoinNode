@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.students.simplebitcoinnode.entity.Transaction;
-import org.students.simplebitcoinnode.entity.TransactionOutput;
+import org.students.simplebitcoinnode.dto.TransactionDTO;
+import org.students.simplebitcoinnode.dto.TransactionOutputDTO;
 import org.students.simplebitcoinnode.entity.validation.CryptographicSignatureConstraintValidator;
 import org.students.simplebitcoinnode.entity.validation.DoubleSpendingConstraintValidator;
 import org.students.simplebitcoinnode.entity.validation.TransactionHashConstraintValidator;
@@ -54,11 +54,11 @@ public class TransactionValidationTests {
         final String fakeHashStr = "0".repeat(64);
 
         // create a test transaction object
-        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(senderPublicKey, recipientPublicKey);
+        TransactionDTO transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(senderPublicKey, recipientPublicKey);
         transaction.setTransactionHash(fakeHashStr);
 
         // for each transaction output, set fake signature
-        for (TransactionOutput output : transaction.getOutputs())
+        for (TransactionOutputDTO output : transaction.getOutputs())
             output.setSignature(fakeSignatureStr);
 
         // mock digestObject(), presumably used in TransactionHashConstraint
@@ -86,7 +86,7 @@ public class TransactionValidationTests {
     @DisplayName("Ensure that validation error is given when signature is null")
     public void testInvalidTransaction_NullSignature_ExpectCryptographicSignatureValidationError() throws Exception {
         // create a test transaction object
-        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(senderPublicKey, recipientPublicKey);
+        TransactionDTO transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(senderPublicKey, recipientPublicKey);
         transaction.setTransactionHash("0".repeat(64));
 
         given(asymmetricCryptographyService.digestObject(transaction))
@@ -102,7 +102,7 @@ public class TransactionValidationTests {
         final String fakeHashStr = "0".repeat(64);
 
         // create a test transaction object
-        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(senderPublicKey, recipientPublicKey);
+        TransactionDTO transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(senderPublicKey, recipientPublicKey);
         transaction.setTransactionHash(fakeHashStr);
 
         // set some random signatures to outputs
@@ -125,14 +125,14 @@ public class TransactionValidationTests {
     public void testInvalidTransaction_MalformedSignature_ExpectNoExceptionsAndCryptographicSignatureValidationError() throws Exception {
         final String fakeHashStr = "0".repeat(64);
         // create a test transaction object
-        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(senderPublicKey, recipientPublicKey);
+        TransactionDTO transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(senderPublicKey, recipientPublicKey);
         transaction.setTransactionHash(fakeHashStr);
 
         given(asymmetricCryptographyService.digestObject(transaction))
             .willReturn(Encoding.hexStringToBytes(fakeHashStr));
 
         // set malformed signatures to transaction outputs
-        for (TransactionOutput output : transaction.getOutputs()) {
+        for (TransactionOutputDTO output : transaction.getOutputs()) {
             output.setSignature("Hello, I am an invalid signature as you can see.");
         }
 
@@ -149,11 +149,11 @@ public class TransactionValidationTests {
     @Test
     @DisplayName("Ensure that reusing already used Transaction output as new Transaction's input gives DoubleSpendingConstraint error")
     public void testInvalidTransaction_DoubleSpending_ExpectDoubleSpendingConstraintError() {
-        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(senderPublicKey, recipientPublicKey);
+        TransactionDTO transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(senderPublicKey, recipientPublicKey);
         transaction.setTransactionHash("0".repeat(64));
 
         // set random signatures
-        for (TransactionOutput output : transaction.getOutputs()) {
+        for (TransactionOutputDTO output : transaction.getOutputs()) {
             output.setSignature("0".repeat(144));
         }
 
@@ -172,11 +172,11 @@ public class TransactionValidationTests {
         final String fakeHashStr = "0".repeat(64);
         final String calculatedHashStr = "1".repeat(64);
 
-        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(senderPublicKey, recipientPublicKey);
+        TransactionDTO transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(senderPublicKey, recipientPublicKey);
         transaction.setTransactionHash(fakeHashStr);
 
         // set signatures
-        for (TransactionOutput output : transaction.getOutputs()) {
+        for (TransactionOutputDTO output : transaction.getOutputs()) {
             output.setSignature("0".repeat(144));
         }
 
@@ -191,10 +191,10 @@ public class TransactionValidationTests {
     @Test
     @DisplayName("Ensure that TransactionHashConstraint error is given and no exceptions thrown when specified transaction hash is null")
     public void testInvalidTransaction_NullHash_ExpectTransactionHashConstraintErrorDoesNotThrow() {
-        Transaction transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(senderPublicKey, recipientPublicKey);
+        TransactionDTO transaction = TestTransactionBuilder.aliceSendsToBobCustomKeys(senderPublicKey, recipientPublicKey);
 
         // set random signatures
-        for (TransactionOutput output : transaction.getOutputs()) {
+        for (TransactionOutputDTO output : transaction.getOutputs()) {
             output.setSignature("0".repeat(144));
         }
 

@@ -5,10 +5,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Profile;
 import org.students.simplebitcoinnode.entity.BlockHeader;
+import org.students.simplebitcoinnode.entity.MerkleTreeNode;
 import org.students.simplebitcoinnode.repository.BlockHeaderRepository;
 import org.students.simplebitcoinnode.repository.MerkleTreeNodeRepository;
 import org.students.simplebitcoinnode.service.AsymmetricCryptographyService;
-import org.students.simplebitcoinnode.entity.MerkleTreeNode;
 import org.students.simplebitcoinnode.util.Encoding;
 
 import java.math.BigInteger;

@@ -68,7 +68,7 @@ public class EncodingTests {
     void testHexadecimalEncodingAndDecodingLeadingNullBytes() throws InvalidEncodedStringException {
         byte[] src = {0x00, 0x00, 0x00, 0x00};
         String hex = Encoding.toHexString(src);
-        assertTrue(Arrays.compare(src, Encoding.hexStringToBytes(hex)) == 0);
+        assertEquals(0, Arrays.compare(src, Encoding.hexStringToBytes(hex)));
     }
 
     /* Base58 encoding and decoding */
@@ -121,6 +121,6 @@ public class EncodingTests {
     void testBase58EncodingAndDecodingLeadingNullBytes() throws InvalidEncodedStringException {
         final byte[] src = {0x00, 0x00, 0x00, 0x00};
         String encoded = Encoding.base58Encode(src);
-        assertTrue(Arrays.compare(src, Encoding.base58Decode(encoded)) == 0);
+        assertEquals(0, Arrays.compare(src, Encoding.base58Decode(encoded)));
     }
 }

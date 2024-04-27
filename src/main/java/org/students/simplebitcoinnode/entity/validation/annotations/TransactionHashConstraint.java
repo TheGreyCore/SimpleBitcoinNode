@@ -4,7 +4,10 @@ import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import org.students.simplebitcoinnode.entity.validation.TransactionHashConstraintValidator;
 
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 @Constraint(validatedBy = TransactionHashConstraintValidator.class)
 @Target({ ElementType.TYPE })
