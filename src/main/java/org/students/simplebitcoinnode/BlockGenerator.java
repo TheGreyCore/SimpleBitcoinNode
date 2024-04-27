@@ -3,6 +3,7 @@ package org.students.simplebitcoinnode;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Profile;
 import org.students.simplebitcoinnode.entity.BlockHeader;
 import org.students.simplebitcoinnode.repository.BlockHeaderRepository;
 import org.students.simplebitcoinnode.repository.MerkleTreeNodeRepository;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.logging.Logger;
 
+@Profile("BlockGenerator")
 @SpringBootApplication
 public class BlockGenerator implements CommandLineRunner {
     // injected dependencies
