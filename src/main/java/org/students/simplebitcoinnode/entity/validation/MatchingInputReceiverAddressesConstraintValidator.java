@@ -32,7 +32,7 @@ public class MatchingInputReceiverAddressesConstraintValidator
         for (TransactionOutputDTO input : transaction.getInputs()) {
             String signature = input.getSignature();
             Optional<TransactionOutput> transactionOutput = transactionOutputRepository.findTransactionOutputBySignature(signature);
-            if (transactionOutput.isEmpty() || !transactionOutput.get().getReceiverPublicKey().equals(input.getReceiverPublicKey()))
+            if (transactionOutput.isEmpty() || !transactionOutput.get().getReceiverPublicKey().equals(transaction.getSenderPublicKey()))
                 return false;
         }
 
