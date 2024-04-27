@@ -46,12 +46,12 @@ public class BlockGenerator implements CommandLineRunner {
      */
     @Override
     public void run(String... args) throws Exception {
-        if (args.length < 3 || !args[0].equals("seed-random-blocks")) {
-            System.err.println("Usage: java BlockGenerator <merkle-tree-leaves> <block-count> [mined <N>]");
+        if (args.length < 2) {
+            System.err.println("Usage: simple-bitcoin-wallet -Dspring.profiles.active=BlockGenerator <block-count> [mined <N>]");
             System.exit(1);
         }
 
-        long merkleTreeLeaves = ((long)Integer.parseInt(args[1]) & 0xffffffffL) - 1L;
+        long merkleTreeLeaves = ((long)Integer.parseInt(args[0]) & 0xffffffffL) - 1L;
         // round up to the next power of 2
         merkleTreeLeaves |= merkleTreeLeaves >> 1;
         merkleTreeLeaves |= merkleTreeLeaves >> 2;
@@ -60,7 +60,7 @@ public class BlockGenerator implements CommandLineRunner {
         merkleTreeLeaves |= merkleTreeLeaves >> 16;
         merkleTreeLeaves++;
 
-        final int blockCount = Integer.parseInt(args[2]);
+        final int blockCount = Integer.parseInt(args[1]);
 
         logger.info("Generating " + blockCount + " random blocks...");
         generateBlocks((int)merkleTreeLeaves, blockCount);
@@ -69,6 +69,8 @@ public class BlockGenerator implements CommandLineRunner {
         blockHeaderRepository.saveAll(blockHeaders);
         merkleTreeNodeRepository.saveAll(merkleTreeRootNodes);
         logger.info("Random block generation is done");
+
+        System.exit(0);
     }
 
     /**

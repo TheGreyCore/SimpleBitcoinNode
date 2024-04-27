@@ -1,8 +1,7 @@
 package org.students.simplebitcoinnode.service;
 
 import org.springframework.stereotype.Service;
-import org.students.simplebitcoinnode.datatransferobjects.GetTransactionDTO;
-import org.students.simplebitcoinnode.datatransferobjects.NewTransactionDTO;
+import org.students.simplebitcoinnode.dto.TransactionDTO;
 import org.students.simplebitcoinnode.entity.Transaction;
 import org.students.simplebitcoinnode.repository.TransactionRepository;
 import org.students.simplebitcoinnode.util.DTOMapperWrapper;
@@ -32,18 +31,18 @@ public class TransactionService {
      * @throws IllegalArgumentException if the provided public key is null or empty.
      * @throws IllegalArgumentException if the provided type is null or empty.
      */
-    public List<GetTransactionDTO> getTransactions(String pubKey, String type) {
+    public List<TransactionDTO> getTransactions(String pubKey, String type) {
         List<Transaction> transactions;
-        return switch (type) {
+        return switch (type.toLowerCase()) {
             case "sent":
                 transactions = transactionRepository.findSentTransactionsByPublicKeyAddress(pubKey);
-                yield dtoMapperWrapper.mapAll(transactions, GetTransactionDTO.class);
+                yield dtoMapperWrapper.mapAll(transactions, TransactionDTO.class);
             case "received":
                 transactions = transactionRepository.findAllReceivedTransactionsByPublicKeyAddress(pubKey);
-                yield dtoMapperWrapper.mapAll(transactions, GetTransactionDTO.class);
+                yield dtoMapperWrapper.mapAll(transactions, TransactionDTO.class);
             case "all":
                 transactions = transactionRepository.findAllTransactionsByPublicKeyAddress(pubKey);
-                yield dtoMapperWrapper.mapAll(transactions, GetTransactionDTO.class);
+                yield dtoMapperWrapper.mapAll(transactions, TransactionDTO.class);
             default: yield null;
         };
     }
@@ -57,8 +56,8 @@ public class TransactionService {
      *             It returns 201 if the transaction was successfully created, and 400 if an exception occurred.
      */
     
-    public GetTransactionDTO newTransactions(NewTransactionDTO newTransactionDTO) {
+    public TransactionDTO newTransactions(TransactionDTO newTransactionDTO) {
         Transaction Transaction = transactionRepository.save(dtoMapperWrapper.unmap(newTransactionDTO, org.students.simplebitcoinnode.entity.Transaction.class));
-        return dtoMapperWrapper.map(Transaction, GetTransactionDTO.class);
+        return dtoMapperWrapper.map(Transaction, TransactionDTO.class);
     }
 }

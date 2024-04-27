@@ -2,9 +2,8 @@ package org.students.simplebitcoinnode.unit;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.students.simplebitcoinnode.datatransferobjects.GetTransactionDTO;
-import org.students.simplebitcoinnode.datatransferobjects.NewTransactionDTO;
-import org.students.simplebitcoinnode.datatransferobjects.TransactionOutputDTO;
+import org.students.simplebitcoinnode.dto.TransactionDTO;
+import org.students.simplebitcoinnode.dto.TransactionOutputDTO;
 import org.students.simplebitcoinnode.entity.Transaction;
 import org.students.simplebitcoinnode.entity.TransactionOutput;
 import org.students.simplebitcoinnode.util.DTOMapperWrapper;
@@ -42,7 +41,7 @@ public class DTOMapperWrapperTests {
         transaction.setSenderPublicKey("senderPublicKey");
         transaction.setTimestamp(LocalDateTime.now());
 
-        GetTransactionDTO result = dtoMapperWrapper.map(transaction, GetTransactionDTO.class);
+        TransactionDTO result = dtoMapperWrapper.map(transaction, TransactionDTO.class);
 
         assertEquals("transactionHash", result.getTransactionHash());
         assertEquals("senderPublicKey", result.getSenderPublicKey());
@@ -53,7 +52,7 @@ public class DTOMapperWrapperTests {
     @Test
     @DisplayName("Test unmapping a DTO object to a Transaction object")
     public void testUnmap() {
-        GetTransactionDTO getTransactionDTO = new GetTransactionDTO();
+        TransactionDTO getTransactionDTO = new TransactionDTO();
         getTransactionDTO.setTransactionHash("transactionHash");
         getTransactionDTO.setSenderPublicKey("senderPublicKey");
         getTransactionDTO.setTimestamp(LocalDateTime.now());
@@ -81,7 +80,7 @@ public class DTOMapperWrapperTests {
         transaction.setInputs(List.of(transactionOutput));
         transaction.setOutputs(List.of(transactionOutput));
 
-        NewTransactionDTO result = dtoMapperWrapper.map(transaction, NewTransactionDTO.class);
+        TransactionDTO result = dtoMapperWrapper.map(transaction, TransactionDTO.class);
 
         assertEquals("transactionHash", result.getTransactionHash());
         assertEquals("senderPublicKey", result.getSenderPublicKey());
@@ -94,7 +93,7 @@ public class DTOMapperWrapperTests {
     @Test
     @DisplayName("Test unmapping a DTO object to a newTransaction object")
     public void testUnmapNewTransactionDTO() {
-        NewTransactionDTO newTransactionDTO = new NewTransactionDTO();
+        TransactionDTO newTransactionDTO = new TransactionDTO();
         newTransactionDTO.setTransactionHash("transactionHash");
         newTransactionDTO.setSenderPublicKey("senderPublicKey");
         newTransactionDTO.setTimestamp(LocalDateTime.now());

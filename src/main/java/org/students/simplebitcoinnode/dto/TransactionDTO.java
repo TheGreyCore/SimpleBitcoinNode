@@ -18,11 +18,13 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
+@CryptographicSignatureConstraint
 @TransactionHashConstraint
 @DoubleSpendingConstraint
-@CryptographicSignatureConstraint
 @OneExternalRecipientPerTransactionConstraint
 @MatchingInputReceiverAddressesConstraint
+@TransactionInputSumIsOutputSumConstraint
 public class TransactionDTO implements Externalizable {
     private String transactionHash = "";
     private List<TransactionOutputDTO> inputs = new ArrayList<>();
