@@ -2,6 +2,7 @@ package org.students.simplebitcoinnode.entity.validation.annotations;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
+import org.students.simplebitcoinnode.entity.validation.MatchingInputReceiverAddressesConstraintValidator;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

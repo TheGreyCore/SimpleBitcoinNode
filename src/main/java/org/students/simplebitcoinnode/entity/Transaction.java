@@ -3,9 +3,7 @@ package org.students.simplebitcoinnode.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.students.simplebitcoinnode.entity.validation.annotations.CryptographicSignatureConstraint;
-import org.students.simplebitcoinnode.entity.validation.annotations.DoubleSpendingConstraint;
-import org.students.simplebitcoinnode.entity.validation.annotations.TransactionHashConstraint;
+import org.students.simplebitcoinnode.entity.validation.annotations.*;
 import org.students.simplebitcoinnode.exceptions.encoding.InvalidEncodedStringException;
 import org.students.simplebitcoinnode.util.Encoding;
 
@@ -28,6 +26,9 @@ import java.util.List;
 @TransactionHashConstraint
 @DoubleSpendingConstraint
 @CryptographicSignatureConstraint
+@OneExternalRecipientPerTransactionConstraint
+@MatchingInputReceiverAddressesConstraint
+@PositiveTransactionOutputConstraint
 public class Transaction implements Externalizable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
