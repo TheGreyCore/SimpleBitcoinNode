@@ -6,7 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Profile;
 import org.students.simplebitcoinnode.entity.Block;
 import org.students.simplebitcoinnode.entity.MerkleTreeNode;
-import org.students.simplebitcoinnode.repository.BlockHeaderRepository;
 import org.students.simplebitcoinnode.repository.BlockRepository;
 import org.students.simplebitcoinnode.repository.MerkleTreeNodeRepository;
 import org.students.simplebitcoinnode.service.AsymmetricCryptographyService;
@@ -87,8 +86,8 @@ public class BlockGenerator implements CommandLineRunner {
             block.setMerkleTree(merkleTreeNode);
 
             // if previous block exists chain given block to the previous one
-            if (!merkleTreeRootNodes.isEmpty())
-                block.setPreviousHash(merkleTreeRootNodes.get(i-1).getHash());
+            if (!blocks.isEmpty())
+                block.setPreviousHash(blocks.get(i-1).getHash());
             else block.setPreviousHash("0".repeat(64));
 
             // for now, we use 1 as the nonce value

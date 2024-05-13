@@ -102,7 +102,7 @@ public class TransactionDataGenerator implements CommandLineRunner {
 
             for (int i = 0; i < maxRecipientsFromWallet; i++) {
                 Random random = new Random(System.nanoTime());
-                double f64transferAmount = random.nextDouble(0.00000001, sum.doubleValue() / (double)maxRecipientsFromWallet);
+                double f64transferAmount = random.nextDouble(10e-8, sum.doubleValue() / (double)maxRecipientsFromWallet);
                 // transfer amount with 8 digit precision
                 final BigDecimal transferAmount = new BigDecimal(String.format("%.8f", f64transferAmount));
 

@@ -8,7 +8,7 @@ import org.students.simplebitcoinnode.entity.Transaction;
 import java.util.List;
 
 @Repository
-public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
+public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     /**
      * Find all transactions where given wallet's public key has received some tokens from other wallets excluding return transfers
      * @param publicKey specifies the wallet's public key to use for querying

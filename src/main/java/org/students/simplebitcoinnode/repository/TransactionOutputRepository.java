@@ -12,7 +12,7 @@ import java.util.Optional;
  * Data repository for querying transaction outputs
  */
 @Repository
-public interface TransactionOutputRepository extends JpaRepository<TransactionOutput, Integer> {
+public interface TransactionOutputRepository extends JpaRepository<TransactionOutput, Long> {
     /**
      * Finds the number of unspent transaction outputs with given signature.
      * @param signature specifies the signature to use for searching

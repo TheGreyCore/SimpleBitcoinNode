@@ -15,13 +15,14 @@ import java.math.BigDecimal;
 public class TransactionOutput {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Setter
     @Column(length = 144)
     private String signature;
 
     @Setter
+    @Column(precision = 17, scale = 10)
     private BigDecimal amount;
 
     @Setter

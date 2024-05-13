@@ -3,11 +3,12 @@ package org.students.simplebitcoinnode.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.students.simplebitcoinnode.entity.Block;
+import org.students.simplebitcoinnode.entity.MerkleTreeNode;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface BlockRepository extends JpaRepository<Block, Integer> {
+public interface BlockRepository extends JpaRepository<Block, Long> {
     /**
      * Attempts to find a block header by specified hash
      * @param hash specifies the hash to use for block query
@@ -27,7 +28,7 @@ public interface BlockRepository extends JpaRepository<Block, Integer> {
      * @param merkleTreeRoot specifies the merkle tree root used for querying
      * @return Optional wrapper object containing BlockHeader instance if query returned objects, otherwise the wrapper contains null value
      */
-    Optional<Block> findBlockHeaderByMerkleTreeRoot(String merkleTreeRoot);
+    Optional<Block> findBlockHeaderByMerkleTree(MerkleTreeNode merkleTreeRoot);
 
     /**
      * Queries all recently mined blocks with specified limit
@@ -39,21 +40,21 @@ public interface BlockRepository extends JpaRepository<Block, Integer> {
 
     /**
      * Recursively traverses transactions Merkle tree and returns a BlockHeader instance whose specified Merkle tree root is the traversed tree's root
-     * @param merkleTreeNodeHash specifies the hash of the merkle tree node to use as an entry point for traversal
+     * @param root specifies the hash of the merkle tree root to use as an entry point for traversal
      * @return Optional wrapper object containing BlockHeader instance if query returned objects, otherwise the wrapper contains a null value
      */
     @Query(value = """
-            with recursive search_parent (parent_id, id, hash) as (
-                select i.parent_id, i.id, i.hash
-                from INTERMEDIATE_MERKLE_TREE_NODES i
-                where i.hash = ?1
-                union all
-                select i.parent_id, i.id, i.hash
-                from INTERMEDIATE_MERKLE_TREE_NODES i
-                join search_parent s on s.parent_id = i.ID
-            )
-            select * from BLOCKS
-            where MERKLE_TREE_ROOT = (select hash from search_parent where parent_id is null)
-            """, nativeQuery = true)
-    Optional<Block> findBlockHeaderFromMerkleTreeNode(String merkleTreeNodeHash);
+        WITH RECURSIVE SEARCH_PARENT (parent_id, id, hash) AS (
+            SELECT i.PARENT_ID, i.ID, i.HASH
+            FROM INTERMEDIATE_MERKLE_TREE_NODES i
+            WHERE i.HASH = ?1
+            UNION ALL
+            SELECT i.PARENT_ID, i.ID, i.HASH
+            FROM INTERMEDIATE_MERKLE_TREE_NODES i
+            JOIN SEARCH_PARENT s ON s.PARENT_ID = i.ID
+        )
+        SELECT * FROM BLOCKS
+        WHERE MERKLE_TREE_ROOT = (SELECT ID FROM SEARCH_PARENT WHERE parent_id IS NULL);
+    """, nativeQuery = true)
+    Optional<Block> findBlockByMerkleTreeNodeHash(String hash);
 }

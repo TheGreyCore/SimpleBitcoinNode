@@ -29,7 +29,7 @@ public class Block implements Externalizable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(length = 64)
     @NotNull(message = "Previous hash (SHA256) must be previously calculated")
@@ -37,7 +37,8 @@ public class Block implements Externalizable {
     private String previousHash;
 
     @NotNull(message = "Each block must contain at least one transaction")
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "block_root_node")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "merkle_tree_root", referencedColumnName = "id")
     private MerkleTreeNode merkleTree;
 
     @Builder.Default
@@ -47,6 +48,7 @@ public class Block implements Externalizable {
     private LocalDateTime minedTimestamp;
 
     @NotNull(message = "Nonce value cannot be null")
+    @Column(scale = 64)
     private BigInteger nonce;
 
     @Column(length = 64)

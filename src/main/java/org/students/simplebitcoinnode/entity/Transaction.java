@@ -26,7 +26,7 @@ import java.util.List;
 public class Transaction implements Externalizable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(length = 64)
     @NotNull(message = "Transaction hash (SHA256) must be previously calculated")

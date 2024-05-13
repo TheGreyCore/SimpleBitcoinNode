@@ -24,7 +24,7 @@ public class MerkleTreeNode implements Externalizable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(length = 64)
     @NotNull(message = "IntermediateMerkleTreeNode's hash cannot be set to null")
