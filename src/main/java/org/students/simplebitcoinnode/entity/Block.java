@@ -11,6 +11,7 @@ import java.io.*;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 
 @Entity
 @Table(name = "BLOCKS")
@@ -19,7 +20,7 @@ import java.time.ZoneId;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BlockHeader implements Externalizable {
+public class Block implements Externalizable {
     @Serial
     private static final long serialVersionUID = 0x010000L;
 
@@ -35,10 +36,9 @@ public class BlockHeader implements Externalizable {
     @Length(min = 64, max = 64)
     private String previousHash;
 
-    @Column(length = 64)
-    @NotNull(message = "Merkle tree root must be specified in block header")
-    @Length(min = 64, max = 64)
-    private String merkleTreeRoot;
+    @NotNull(message = "Each block must contain at least one transaction")
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "block_root_node")
+    private MerkleTreeNode merkleTree;
 
     @Builder.Default
     private LocalDateTime blockAssemblyTimestamp = LocalDateTime.now(ZoneId.of("UTC"));
@@ -57,11 +57,9 @@ public class BlockHeader implements Externalizable {
     public void writeExternal(ObjectOutput out) throws IOException {
         try {
             out.write(Encoding.hexStringToBytes(previousHash));
-            out.write(Encoding.hexStringToBytes(merkleTreeRoot));
+            out.write(Encoding.hexStringToBytes(merkleTree.getHash()));
             out.writeObject(blockAssemblyTimestamp);
-            byte[] nonceBytes = nonce.toByteArray();
-            out.write(nonceBytes.length);
-            out.write(nonceBytes);
+            out.write(nonce.toByteArray());
         }
         catch (InvalidEncodedStringException e) {
             throw new IOException(e.getMessage());

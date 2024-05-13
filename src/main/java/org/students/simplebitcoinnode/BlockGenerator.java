@@ -4,9 +4,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Profile;
-import org.students.simplebitcoinnode.entity.BlockHeader;
+import org.students.simplebitcoinnode.entity.Block;
 import org.students.simplebitcoinnode.entity.MerkleTreeNode;
 import org.students.simplebitcoinnode.repository.BlockHeaderRepository;
+import org.students.simplebitcoinnode.repository.BlockRepository;
 import org.students.simplebitcoinnode.repository.MerkleTreeNodeRepository;
 import org.students.simplebitcoinnode.service.AsymmetricCryptographyService;
 import org.students.simplebitcoinnode.util.Encoding;
@@ -24,18 +25,18 @@ import java.util.logging.Logger;
 @SpringBootApplication
 public class BlockGenerator implements CommandLineRunner {
     // injected dependencies
-    private final BlockHeaderRepository blockHeaderRepository;
+    private final BlockRepository blockRepository;
     private final MerkleTreeNodeRepository merkleTreeNodeRepository;
     private final AsymmetricCryptographyService asymmetricCryptographyService;
 
     // lists for containing generated data
     private final List<MerkleTreeNode> merkleTreeRootNodes = new ArrayList<>();
-    private final List<BlockHeader> blockHeaders = new ArrayList<>();
+    private final List<Block> blocks = new ArrayList<>();
 
     Logger logger = Logger.getLogger(BlockGenerator.class.getName());
 
-    public BlockGenerator(BlockHeaderRepository blockHeaderRepository, MerkleTreeNodeRepository merkleTreeNodeRepository, AsymmetricCryptographyService asymmetricCryptographyService) {
-        this.blockHeaderRepository = blockHeaderRepository;
+    public BlockGenerator(BlockRepository blockRepository, MerkleTreeNodeRepository merkleTreeNodeRepository, AsymmetricCryptographyService asymmetricCryptographyService) {
+        this.blockRepository = blockRepository;
         this.merkleTreeNodeRepository = merkleTreeNodeRepository;
         this.asymmetricCryptographyService = asymmetricCryptographyService;
     }
@@ -66,7 +67,7 @@ public class BlockGenerator implements CommandLineRunner {
         generateBlocks((int)merkleTreeLeaves, blockCount);
 
         logger.info("Persisting block headers and merkle tree root nodes...");
-        blockHeaderRepository.saveAll(blockHeaders);
+        blockRepository.saveAll(blocks);
         merkleTreeNodeRepository.saveAll(merkleTreeRootNodes);
         logger.info("Random block generation is done");
 
@@ -82,22 +83,22 @@ public class BlockGenerator implements CommandLineRunner {
         for (int i = 0; i < blockCount; i++) {
             // generate a new Merkle tree
             MerkleTreeNode merkleTreeNode = buildMerkleTree(merkleTreeLeaves * i, merkleTreeLeaves);
-            BlockHeader blockHeader = new BlockHeader();
-            blockHeader.setMerkleTreeRoot(merkleTreeNode.getHash());
+            Block block = new Block();
+            block.setMerkleTree(merkleTreeNode);
 
             // if previous block exists chain given block to the previous one
             if (!merkleTreeRootNodes.isEmpty())
-                blockHeader.setPreviousHash(merkleTreeRootNodes.get(i-1).getHash());
-            else blockHeader.setPreviousHash("0".repeat(64));
+                block.setPreviousHash(merkleTreeRootNodes.get(i-1).getHash());
+            else block.setPreviousHash("0".repeat(64));
 
             // for now, we use 1 as the nonce value
-            blockHeader.setNonce(new BigInteger("1"));
-            blockHeader.setBlockAssemblyTimestamp(LocalDateTime.now(ZoneId.of("UTC")));
-            blockHeader.setMinedTimestamp(LocalDateTime.now(ZoneId.of("UTC")));
-            blockHeader.setHash(Encoding.toHexString(asymmetricCryptographyService.digestObject(blockHeader)));
+            block.setNonce(new BigInteger("1"));
+            block.setBlockAssemblyTimestamp(LocalDateTime.now(ZoneId.of("UTC")));
+            block.setMinedTimestamp(LocalDateTime.now(ZoneId.of("UTC")));
+            block.setHash(Encoding.toHexString(asymmetricCryptographyService.digestObject(block)));
 
             // append to lists
-            blockHeaders.add(blockHeader);
+            blocks.add(block);
             merkleTreeRootNodes.add(merkleTreeNode);
         }
     }
