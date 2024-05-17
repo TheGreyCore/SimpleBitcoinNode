@@ -7,16 +7,15 @@ import org.students.simplebitcoinnode.exceptions.encoding.InvalidEncodedStringEx
 import org.students.simplebitcoinnode.exceptions.encoding.SerializationException;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
+import java.util.Collection;
 
 public interface BlockBuilderService {
     /**
      * Calculate merkle tree root SHA256 hash of given transactions
-     * @param transactions specifies the list of transactions to use for hashing
+     * @param transactions specifies collection list of transactions to use for hashing
      * @return MerkleTreeNode object representing the merkle tree root
      */
-    MerkleTreeNode calculateMerkleTreeRoot(List<Transaction> transactions) throws InvalidEncodedStringException;
+    MerkleTreeNode calculateMerkleTreeRoot(Collection<Transaction> transactions) throws InvalidEncodedStringException;
 
     /**
      * Create a new block from given transactions
@@ -31,5 +30,5 @@ public interface BlockBuilderService {
      * @param blockReward specifies the amount of tokens, block miner receives after mining the block where given coinbase transaction belongs to
      * @return Transaction object representing the coinbase transaction
      */
-    Transaction makeCoinbaseTransaction(List<String> recipientWalletAddresses, BigDecimal blockReward) throws SerializationException;
+    Transaction makeCoinbaseTransaction(Collection<String> recipientWalletAddresses, BigDecimal blockReward) throws SerializationException;
 }

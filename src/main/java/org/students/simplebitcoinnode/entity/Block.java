@@ -41,6 +41,10 @@ public class Block implements Externalizable {
     @JoinColumn(name = "merkle_tree_root", referencedColumnName = "id")
     private MerkleTreeNode merkleTree;
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "input_id")
+    private List<MinerPublicKey> miners;
+
     @Builder.Default
     private LocalDateTime blockAssemblyTimestamp = LocalDateTime.now(ZoneId.of("UTC"));
 
@@ -60,6 +64,8 @@ public class Block implements Externalizable {
         try {
             out.write(Encoding.hexStringToBytes(previousHash));
             out.write(Encoding.hexStringToBytes(merkleTree.getHash()));
+            for (MinerPublicKey miner : miners)
+                out.write(Encoding.hexStringToBytes(miner.getPubKey()));
             out.writeObject(blockAssemblyTimestamp);
             out.write(nonce.toByteArray());
         }
@@ -70,17 +76,6 @@ public class Block implements Externalizable {
 
     @Override
     public void readExternal(ObjectInput in) throws IOException {
-        // read previousArray and merkleTreeRoot hashes
-        byte[] previousArray = new byte[32];
-        byte[] merkleTreeRoot = new byte[32];
-
-        in.readFully(previousArray);
-        in.readFully(merkleTreeRoot);
-
-        // read nonce value
-        int nonceLength = in.readInt();
-        byte[] nonce = new byte[nonceLength];
-        in.readFully(nonce);
-        this.nonce = new BigInteger(nonce);
+        // do nothing
     }
 }

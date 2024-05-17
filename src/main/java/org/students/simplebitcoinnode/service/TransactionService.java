@@ -10,7 +10,6 @@ import java.util.List;
 
 @Service
 public class TransactionService {
-
     private final TransactionRepository transactionRepository;
     private final DTOMapperWrapper dtoMapperWrapper;
 
@@ -57,7 +56,8 @@ public class TransactionService {
      */
     
     public TransactionDTO newTransactions(TransactionDTO newTransactionDTO) {
-        Transaction Transaction = transactionRepository.save(dtoMapperWrapper.unmap(newTransactionDTO, org.students.simplebitcoinnode.entity.Transaction.class));
-        return dtoMapperWrapper.map(Transaction, TransactionDTO.class);
+        Transaction transaction = transactionRepository.save(dtoMapperWrapper.unmap(newTransactionDTO, org.students.simplebitcoinnode.entity.Transaction.class));
+
+        return dtoMapperWrapper.map(transaction, TransactionDTO.class);
     }
 }

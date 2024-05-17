@@ -50,6 +50,11 @@ public class Transaction implements Externalizable {
     private LocalDateTime timestamp = LocalDateTime.now(ZoneId.of("UTC"));
 
     @Override
+    public int hashCode() {
+        return transactionHash.hashCode();
+    }
+
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         try {
             out.writeInt(inputs.size());

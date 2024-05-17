@@ -39,8 +39,15 @@ public interface BlockRepository extends JpaRepository<Block, Long> {
     List<Block> findAllByOrderByMinedTimestampLimit(Integer limit);
 
     /**
+     * Counts how many mined blocks exist in the blockchain and returns the total amount
+     * @return amount of blocks in blockchain
+     */
+    @Query(value = "SELECT COUNT(*) FROM BLOCKS WHERE SUBSTR(HASH, 1, 10) = '0000000000'", nativeQuery = true)
+    Long findTotalAmountOfMinedBlocks();
+
+    /**
      * Recursively traverses transactions Merkle tree and returns a BlockHeader instance whose specified Merkle tree root is the traversed tree's root
-     * @param root specifies the hash of the merkle tree root to use as an entry point for traversal
+     * @param hash specifies the hash of the merkle tree root to use as an entry point for traversal
      * @return Optional wrapper object containing BlockHeader instance if query returned objects, otherwise the wrapper contains a null value
      */
     @Query(value = """

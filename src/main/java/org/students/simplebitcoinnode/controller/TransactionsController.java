@@ -46,7 +46,7 @@ public class TransactionsController {
      * @return returns the result of the transaction creation.
      */
     @PostMapping("/send")
-    public ResponseEntity<?> newTransactions(@Valid @RequestBody TransactionDTO newTransactionDTO){
+    public ResponseEntity<?> newTransactions(@Valid @RequestBody TransactionDTO newTransactionDTO) {
         return ResponseEntity.ok().body(transactionService.newTransactions(newTransactionDTO));
     }
 

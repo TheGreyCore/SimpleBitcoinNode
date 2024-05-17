@@ -42,6 +42,19 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Transaction> findAllTransactionsByPublicKeyAddress(String publicKey);
 
     /**
+     * Queries the amount of unverified transactions, i.e. transactions which haven't been mined into a block
+     * @return long value representing the total amount of unverified transactions
+     */
+    @Query(value = """
+        SELECT COUNT(*) FROM LEDGER l
+        WHERE l.ID NOT IN (
+            SELECT i.TRANSACTION_ID FROM INTERMEDIATE_MERKLE_TREE_NODES i
+            WHERE i.TRANSACTION_ID != NULL
+        )
+    """, nativeQuery = true)
+    Long findAmountOfUnverifiedTransactions();
+
+    /**
      * Queries N unverified transactions (i.e. not belonging to any merkle tree) ordered by timestamp
      * @param limit specifies the maximum amount of transactions to query for
      * @return list containing at max N unverified transactions

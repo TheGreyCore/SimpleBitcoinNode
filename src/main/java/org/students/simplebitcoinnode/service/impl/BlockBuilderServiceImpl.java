@@ -11,15 +11,12 @@ import org.students.simplebitcoinnode.service.AsymmetricCryptographyService;
 import org.students.simplebitcoinnode.service.BlockBuilderService;
 import org.students.simplebitcoinnode.util.Encoding;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
-import java.math.BigDecimal;
+import java.util.*;
 
 @Service
 public class BlockBuilderServiceImpl implements BlockBuilderService {
@@ -30,7 +27,7 @@ public class BlockBuilderServiceImpl implements BlockBuilderService {
     }
 
     @Override
-    public MerkleTreeNode calculateMerkleTreeRoot(List<Transaction> transactions) throws InvalidEncodedStringException {
+    public MerkleTreeNode calculateMerkleTreeRoot(Collection<Transaction> transactions) throws InvalidEncodedStringException {
         Queue<MerkleTreeNode> treeQueue = new ArrayDeque<>();
         for (Transaction transaction : transactions)
             treeQueue.add(MerkleTreeNode.builder().hash(transaction.getTransactionHash()).transaction(transaction).build());
@@ -67,19 +64,21 @@ public class BlockBuilderServiceImpl implements BlockBuilderService {
     }
 
     @Override
-    public Transaction makeCoinbaseTransaction(List<String> recipientWalletAddresses, BigDecimal blockReward) throws SerializationException {
+    public Transaction makeCoinbaseTransaction(Collection<String> recipientWalletAddresses, BigDecimal blockReward) throws SerializationException {
         Transaction transaction = new Transaction();
         transaction.setSenderPublicKey("0".repeat(178));
 
         List<TransactionOutput> outputs = new ArrayList<>(recipientWalletAddresses.size());
-        BigDecimal rewardsPerWallet = blockReward.divide(new BigDecimal(recipientWalletAddresses.size()), 8, RoundingMode.HALF_UP);
+        BigDecimal rewardsPerWallet = blockReward.divide(new BigDecimal(recipientWalletAddresses.size()), 8, RoundingMode.HALF_DOWN);
 
-        for (int i = 0; i < recipientWalletAddresses.size(); i++) {
+        int i = 0;
+        for (String recipientWalletAddress : recipientWalletAddresses) {
             outputs.set(i, TransactionOutput.builder()
-                            .amount(rewardsPerWallet)
-                            .receiverPublicKey(recipientWalletAddresses.get(i))
-                            .signature("0".repeat(144))
-                            .build());
+                    .amount(rewardsPerWallet)
+                    .receiverPublicKey(recipientWalletAddress)
+                    .signature("0".repeat(144))
+                    .build());
+            i++;
         }
 
         transaction.setOutputs(outputs);
