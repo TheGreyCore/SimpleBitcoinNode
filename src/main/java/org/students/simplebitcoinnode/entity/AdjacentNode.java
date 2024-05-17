@@ -1,10 +1,7 @@
 package org.students.simplebitcoinnode.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Positive;
 import lombok.*;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.UniqueElements;
 
 @Setter
 @Getter

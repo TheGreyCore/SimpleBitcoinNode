@@ -4,8 +4,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Profile;
+import org.students.simplebitcoinnode.config.BlockchainMiningConfig;
 import org.students.simplebitcoinnode.entity.Block;
 import org.students.simplebitcoinnode.entity.MerkleTreeNode;
+import org.students.simplebitcoinnode.entity.MinerPublicKey;
 import org.students.simplebitcoinnode.repository.BlockRepository;
 import org.students.simplebitcoinnode.repository.MerkleTreeNodeRepository;
 import org.students.simplebitcoinnode.service.AsymmetricCryptographyService;
@@ -27,6 +29,7 @@ public class BlockGenerator implements CommandLineRunner {
     private final BlockRepository blockRepository;
     private final MerkleTreeNodeRepository merkleTreeNodeRepository;
     private final AsymmetricCryptographyService asymmetricCryptographyService;
+    private final BlockchainMiningConfig blockchainMiningConfig;
 
     // lists for containing generated data
     private final List<MerkleTreeNode> merkleTreeRootNodes = new ArrayList<>();
@@ -34,10 +37,14 @@ public class BlockGenerator implements CommandLineRunner {
 
     Logger logger = Logger.getLogger(BlockGenerator.class.getName());
 
-    public BlockGenerator(BlockRepository blockRepository, MerkleTreeNodeRepository merkleTreeNodeRepository, AsymmetricCryptographyService asymmetricCryptographyService) {
+    public BlockGenerator(BlockRepository blockRepository,
+                          MerkleTreeNodeRepository merkleTreeNodeRepository,
+                          AsymmetricCryptographyService asymmetricCryptographyService,
+                          BlockchainMiningConfig blockchainMiningConfig) {
         this.blockRepository = blockRepository;
         this.merkleTreeNodeRepository = merkleTreeNodeRepository;
         this.asymmetricCryptographyService = asymmetricCryptographyService;
+        this.blockchainMiningConfig = blockchainMiningConfig;
     }
 
     /**
@@ -92,6 +99,7 @@ public class BlockGenerator implements CommandLineRunner {
 
             // for now, we use 1 as the nonce value
             block.setNonce(new BigInteger("1"));
+            block.setMiners(List.of(new MinerPublicKey(null, blockchainMiningConfig.getRewardAddress())));
             block.setBlockAssemblyTimestamp(LocalDateTime.now(ZoneId.of("UTC")));
             block.setMinedTimestamp(LocalDateTime.now(ZoneId.of("UTC")));
             block.setHash(Encoding.toHexString(asymmetricCryptographyService.digestObject(block)));

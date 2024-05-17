@@ -42,7 +42,7 @@ public class Block implements Externalizable {
     private MerkleTreeNode merkleTree;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "input_id")
+    @JoinColumn(name = "block_id")
     private List<MinerPublicKey> miners;
 
     @Builder.Default

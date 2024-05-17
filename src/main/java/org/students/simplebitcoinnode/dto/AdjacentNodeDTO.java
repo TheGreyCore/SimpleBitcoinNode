@@ -1,10 +1,10 @@
 package org.students.simplebitcoinnode.dto;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
-import org.hibernate.validator.constraints.UniqueElements;
-
-import java.util.Optional;
 
 @Setter
 @Getter
@@ -12,7 +12,6 @@ import java.util.Optional;
 @AllArgsConstructor
 @Builder
 public class AdjacentNodeDTO {
-    @NotNull
     private String name;
 
     @NotNull

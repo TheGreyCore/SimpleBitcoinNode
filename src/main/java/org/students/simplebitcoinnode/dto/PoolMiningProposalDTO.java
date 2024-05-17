@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PoolInitiationDTO {
+public class PoolMiningProposalDTO {
     private BlockIntroductionDTO block;
     private Integer expectedPoolSize;
 }

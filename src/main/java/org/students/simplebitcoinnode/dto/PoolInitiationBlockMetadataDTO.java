@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class PoolInitiationBlockMetadataDTO {
+    private String hash;
     private List<String> miners;
     private Integer offset;
-    private Integer stride;
 }

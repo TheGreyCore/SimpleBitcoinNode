@@ -46,7 +46,7 @@ public interface BlockRepository extends JpaRepository<Block, Long> {
     Long findTotalAmountOfMinedBlocks();
 
     /**
-     * Recursively traverses transactions Merkle tree and returns a BlockHeader instance whose specified Merkle tree root is the traversed tree's root
+     * Recursively traverses transactions Merkle tree and returns a Block instance whose specified Merkle tree root is the traversed tree's root
      * @param hash specifies the hash of the merkle tree root to use as an entry point for traversal
      * @return Optional wrapper object containing BlockHeader instance if query returned objects, otherwise the wrapper contains a null value
      */
@@ -60,8 +60,27 @@ public interface BlockRepository extends JpaRepository<Block, Long> {
             FROM INTERMEDIATE_MERKLE_TREE_NODES i
             JOIN SEARCH_PARENT s ON s.PARENT_ID = i.ID
         )
-        SELECT * FROM BLOCKS
+        SELECT TOP 1 * FROM BLOCKS
         WHERE MERKLE_TREE_ROOT = (SELECT ID FROM SEARCH_PARENT WHERE parent_id IS NULL);
     """, nativeQuery = true)
     Optional<Block> findBlockByMerkleTreeNodeHash(String hash);
+
+    /**
+     * Recursively searches for a block with the longest chain and returns a Block instance if such block was found
+     * @return a block object representing the Block with the longest chain
+     */
+    @Query(value = """
+        WITH RECURSIVE SEARCH_LONGEST (PREVIOUS_HASH, HASH, CHAIN_LENGTH) AS (
+            SELECT b.PREVIOUS_HASH, b.HASH, 1 as CHAIN_LENGTH
+            FROM BLOCKS b
+            WHERE PREVIOUS_HASH = '0000000000000000000000000000000000000000000000000000000000000000'
+            UNION ALL
+            SELECT b.PREVIOUS_HASH, b.HASH, s.CHAIN_LENGTH + 1 AS CHAIN_LENGTH
+            FROM BLOCKS b
+            JOIN SEARCH_LONGEST s ON s.HASH = b.PREVIOUS_HASH
+        )
+        SELECT TOP 1 * FROM BLOCKS
+        WHERE HASH = (SELECT TOP 1 HASH FROM SEARCH_LONGEST ORDER BY CHAIN_LENGTH DESC)
+    """, nativeQuery = true)
+    Block findBlockWithLongestChain();
 }

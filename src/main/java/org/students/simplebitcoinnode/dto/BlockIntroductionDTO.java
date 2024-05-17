@@ -1,6 +1,5 @@
 package org.students.simplebitcoinnode.dto;
 
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -12,6 +11,6 @@ import java.time.LocalDateTime;
 @Builder
 public class BlockIntroductionDTO {
     private String previousHash;
-    private MerkleTreeNodeDTO merkleTreeRoot;
-    private LocalDateTime timestamp;
+    private MerkleTreeNodeDTO merkleTree;
+    private LocalDateTime blockAssemblyTimestamp;
 }

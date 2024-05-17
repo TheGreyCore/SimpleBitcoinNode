@@ -11,6 +11,5 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 public class BlockchainMiningPoolConfig {
     private Boolean enabled;
-    private Float minimumRewardCoefficient;
-    private Integer maxiumPoolRequests;
+    private Integer maximumPoolRequests;
 }
