@@ -28,6 +28,13 @@ public abstract class AsymmetricCryptographyService {
     public abstract byte[] digestObject(Serializable messageObject) throws SerializationException;
 
     /**
+     * Digests given byte array and returns its calculated hash. The specific hashing algorithm is implementation dependent
+     * @param bytes specifies the byte array of data to use for hashing
+     * @return byte array containing the calculated hash
+     */
+    public abstract byte[] digestBytes(byte[] bytes);
+
+    /**
      * Verifies if the digital signature matches signer's public key and the message that was signed.
      * @param messageObject specifies the Serializable object that composes the message
      * @param signature specifies the signature itself as a byte array

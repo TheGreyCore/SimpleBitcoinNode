@@ -65,7 +65,7 @@ public class Block implements Externalizable {
             out.write(Encoding.hexStringToBytes(previousHash));
             out.write(Encoding.hexStringToBytes(merkleTree.getHash()));
             for (MinerPublicKey miner : miners)
-                out.write(Encoding.hexStringToBytes(miner.getPubKey()));
+                out.write(Encoding.defaultPubKeyDecoding(miner.getPubKey()));
             out.writeObject(blockAssemblyTimestamp);
             out.write(nonce.toByteArray());
         }

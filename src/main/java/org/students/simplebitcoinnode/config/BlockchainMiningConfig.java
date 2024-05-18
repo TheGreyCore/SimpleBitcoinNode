@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 public class BlockchainMiningConfig {
     private Boolean enabled;
+    private Long minedBlockZeroBitCount;
+    private Integer threadCount;
     private Integer transactionsPerBlock;
     private BlockchainMiningPoolConfig pool;
     private String blockConstructionCron;
