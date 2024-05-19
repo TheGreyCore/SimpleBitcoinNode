@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.students.simplebitcoinnode.dto.PoolInitiationBlockMetadataDTO;
 import org.students.simplebitcoinnode.dto.PoolMiningProposalDTO;
 import org.students.simplebitcoinnode.service.MiningService;
 
@@ -32,5 +33,15 @@ public class MiningController {
             return ResponseEntity.badRequest().body(illegalArgumentException);
         }
         return ResponseEntity.ok().body("New propose saved.");
+    }
+
+    @PostMapping("/initiate")
+    public ResponseEntity<?> initiate(@RequestBody PoolInitiationBlockMetadataDTO poolInitiationBlockMetadataDTO){
+        try {
+            miningService.initiate(poolInitiationBlockMetadataDTO);
+        } catch (Exception e){ // TODO: Change.
+            ResponseEntity.badRequest().body(e);
+        }
+        return ResponseEntity.ok().body("New block initialized.");
     }
 }
