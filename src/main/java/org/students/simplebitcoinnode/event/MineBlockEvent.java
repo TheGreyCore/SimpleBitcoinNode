@@ -14,8 +14,8 @@ public class MineBlockEvent extends ApplicationEvent {
     private final BigInteger offset;
     private final BigInteger stride;
 
-    public MineBlockEvent(Object source, Block block, BigInteger offset, BigInteger stride) {
-        super(source);
+    public MineBlockEvent(Object src, Block block, BigInteger offset, BigInteger stride) {
+        super(src);
         this.block = block;
         this.offset = offset;
         this.stride = stride;

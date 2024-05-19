@@ -66,6 +66,8 @@ public abstract class AsymmetricCryptographyService {
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
              ObjectOutputStream out = new ObjectOutputStream(byteArrayOutputStream))
         {
+            out.reset();
+            byteArrayOutputStream.reset();
             if (serializable instanceof Externalizable)
                 ((Externalizable)serializable).writeExternal(out);
             else out.writeObject(serializable);

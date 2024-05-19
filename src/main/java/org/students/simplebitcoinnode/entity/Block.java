@@ -20,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Block implements Externalizable {
+public class Block implements Externalizable, Cloneable {
     @Serial
     private static final long serialVersionUID = 0x010000L;
 
@@ -58,6 +58,11 @@ public class Block implements Externalizable {
     @Column(length = 64)
     @NotNull(message = "Block hash cannot be set to null")
     private String hash;
+
+    @Override
+    public Object clone() {
+        return new Block(id, previousHash, merkleTree, miners, blockAssemblyTimestamp, minedTimestamp, nonce, hash);
+    }
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {

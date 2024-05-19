@@ -1,69 +1,73 @@
 package org.students.simplebitcoinnode.event.listener;
 
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationListener;
 import org.students.simplebitcoinnode.entity.Block;
 import org.students.simplebitcoinnode.event.BlockMinedEvent;
 import org.students.simplebitcoinnode.exceptions.encoding.InvalidEncodedStringException;
-import org.students.simplebitcoinnode.repository.BlockRepository;
 import org.students.simplebitcoinnode.service.AsymmetricCryptographyService;
 import org.students.simplebitcoinnode.util.Encoding;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
-public class MineWorker implements Runnable, ApplicationListener<BlockMinedEvent> {
+public class MineWorker implements Runnable {
     private final Logger logger = Logger.getLogger(MineWorker.class.getName());
     private final AsymmetricCryptographyService asymmetricCryptographyService;
     private final ApplicationEventPublisher applicationEventPublisher;
-    private final BlockRepository blockRepository;
     private final BigInteger offset;
     private final BigInteger stride;
     private final Long zeroBitCondition;
     private final Block block;
-    private final AtomicBoolean continueMining = new AtomicBoolean(true);
+    private final AtomicBoolean continueMining;
 
     public MineWorker(AsymmetricCryptographyService asymmetricCryptographyService,
                       ApplicationEventPublisher applicationEventPublisher,
-                      BlockRepository blockRepository,
                       BigInteger offset,
                       BigInteger stride,
                       Long zeroBitCondition,
-                      Block block) {
+                      Block block,
+                      AtomicBoolean continueMining) {
         this.asymmetricCryptographyService = asymmetricCryptographyService;
         this.applicationEventPublisher = applicationEventPublisher;
-        this.blockRepository = blockRepository;
         this.offset = offset;
         this.stride = stride;
         this.zeroBitCondition = zeroBitCondition;
         this.block = block;
+        this.continueMining = continueMining;
     }
 
     @Override
     public void run() {
         block.setNonce(offset);
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-             ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream)) {
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+             ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream)) {
             long prefixVal = castPrefixValBigEndian(Encoding.hexStringToBytes(block.getHash()));
 
-            while (continueMining.get() && (prefixVal & ((1L << (zeroBitCondition + 1)) - 1)) == 0) {
-                outputStream.reset();
+            while (continueMining.get() && (prefixVal & ((1L << zeroBitCondition) - 1)) != 0) {
+                objectOutputStream.reset();
+                byteArrayOutputStream.reset();
                 block.writeExternal(objectOutputStream);
-                outputStream.flush();
-                byte[] bytes = outputStream.toByteArray();
+                objectOutputStream.flush();
+                byte[] bytes = byteArrayOutputStream.toByteArray();
                 byte[] hash = asymmetricCryptographyService.digestBytes(bytes);
-                block.setNonce(block.getNonce().add(stride));
                 block.setHash(Encoding.toHexString(hash));
+                prefixVal = castPrefixValBigEndian(hash);
+                if ((prefixVal & ((1L << zeroBitCondition) - 1)) != 0)
+                    block.setNonce(block.getNonce().add(stride));
             }
 
             // block was mined on this thread
-            if ((prefixVal & ((1L << (zeroBitCondition + 1)) - 1)) == 0) {
-                blockRepository.save(block);
-                applicationEventPublisher.publishEvent(new BlockMinedEvent(applicationEventPublisher, block.getId()));
+            if ((prefixVal & ((1L << zeroBitCondition) - 1)) == 0) {
+                continueMining.set(false);
+                block.setMinedTimestamp(LocalDateTime.now(ZoneId.of("UTC")));
+                applicationEventPublisher.publishEvent(new BlockMinedEvent(this, block));
             }
 
         }
@@ -84,11 +88,5 @@ public class MineWorker implements Runnable, ApplicationListener<BlockMinedEvent
                 ((hash[2] & 0xFFL) << 16) |
                 ((hash[1] & 0xFFL) << 8) |
                 ((hash[0] & 0xFFL));
-    }
-
-    @Override
-    public void onApplicationEvent(BlockMinedEvent event) {
-        if (event.getId().equals(block.getId()))
-            this.continueMining.set(false);
     }
 }
