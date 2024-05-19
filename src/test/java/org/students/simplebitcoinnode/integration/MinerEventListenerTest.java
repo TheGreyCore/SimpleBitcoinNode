@@ -22,8 +22,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
-import static org.mockito.BDDMockito.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)

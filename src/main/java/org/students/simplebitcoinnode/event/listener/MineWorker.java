@@ -8,7 +8,6 @@ import org.students.simplebitcoinnode.service.AsymmetricCryptographyService;
 import org.students.simplebitcoinnode.util.Encoding;
 
 import java.io.ByteArrayOutputStream;
-import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;

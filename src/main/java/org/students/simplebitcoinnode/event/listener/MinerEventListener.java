@@ -1,17 +1,14 @@
 package org.students.simplebitcoinnode.event.listener;
 
 import lombok.Getter;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.students.simplebitcoinnode.config.BlockchainMiningConfig;
 import org.students.simplebitcoinnode.entity.Block;
 import org.students.simplebitcoinnode.event.MineBlockEvent;
-import org.students.simplebitcoinnode.repository.BlockRepository;
 import org.students.simplebitcoinnode.service.AsymmetricCryptographyService;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
