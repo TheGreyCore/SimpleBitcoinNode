@@ -16,10 +16,17 @@ import java.time.ZoneId;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
+/**
+ * Worker class that mines a specified region of the block nonce in one thread
+ */
 public class MineWorker implements Runnable {
     private final Logger logger = Logger.getLogger(MineWorker.class.getName());
+
+    // injected dependencies
     private final AsymmetricCryptographyService asymmetricCryptographyService;
     private final ApplicationEventPublisher applicationEventPublisher;
+
+    // mining parameters
     private final BigInteger offset;
     private final BigInteger stride;
     private final Long zeroBitCondition;
@@ -42,11 +49,17 @@ public class MineWorker implements Runnable {
         this.continueMining = continueMining;
     }
 
+    /**
+     * Main function that starts block mining with specified offset and stride
+     */
     @Override
     public void run() {
         block.setNonce(offset);
+        // for resource optimization reasons, we use digestBytes instead of digestObject using stream objects that have been constructed only once
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
              ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream)) {
+            // prefixVal is the first 64 bits of the SHA256 hash of the block
+            //  this value is used to check if zeroBitCondition is met
             long prefixVal = castPrefixValBigEndian(Encoding.hexStringToBytes(block.getHash()));
 
             while (continueMining.get() && (prefixVal & ((1L << zeroBitCondition) - 1)) != 0) {

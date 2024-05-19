@@ -14,6 +14,7 @@ import org.students.simplebitcoinnode.entity.MerkleTreeNode;
 import org.students.simplebitcoinnode.entity.MinerPublicKey;
 import org.students.simplebitcoinnode.event.MineBlockEvent;
 import org.students.simplebitcoinnode.event.listener.MinerEventListener;
+import org.students.simplebitcoinnode.event.listener.MinerProcess;
 import org.students.simplebitcoinnode.service.AsymmetricCryptographyService;
 import org.students.simplebitcoinnode.util.Encoding;
 
@@ -21,13 +22,15 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
-public class MinerEventListenerTest {
+public class MinerEventListenerTests {
     // injected dependencies
     private final AsymmetricCryptographyService asymmetricCryptographyService;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -37,7 +40,7 @@ public class MinerEventListenerTest {
     private BlockchainMiningConfig blockchainMiningConfig;
 
     @Autowired
-    public MinerEventListenerTest(AsymmetricCryptographyService asymmetricCryptographyService, ApplicationEventPublisher applicationEventPublisher, TestEventListener testEventListener) {
+    public MinerEventListenerTests(AsymmetricCryptographyService asymmetricCryptographyService, ApplicationEventPublisher applicationEventPublisher, TestEventListener testEventListener) {
         this.asymmetricCryptographyService = asymmetricCryptographyService;
         this.applicationEventPublisher = applicationEventPublisher;
         this.testEventListener = testEventListener;
@@ -60,11 +63,11 @@ public class MinerEventListenerTest {
     }
 
     @Test
-    @DisplayName("Test that block mining works as intended")
-    public void testBlockMining() throws Exception {
+    @DisplayName("Ensure that miner processes get spawned and destroyed as intended")
+    public void testProcessSpawnAndDestruction() throws Exception {
         Block testBlock = buildTestBlock();
-        final long zeroBits = 20;
-        final int threadCount = 12;
+        final long zeroBits = 40;
+        final int threadCount = Runtime.getRuntime().availableProcessors();
 
         given(blockchainMiningConfig.getMinedBlockZeroBitCount())
                 .willReturn(zeroBits);
@@ -78,10 +81,48 @@ public class MinerEventListenerTest {
 
         MineBlockEvent event = new MineBlockEvent(this, testBlock, BigInteger.ZERO, BigInteger.ONE);
         listener.onApplicationEvent(event);
-        List<Thread> threads = listener.getThreads();
+        Map<String, MinerProcess> processTable = listener.getMinerProcesses();
 
-        for (Thread thread : threads)
-            thread.join();
+        // ensure that miner process was created with correct key
+        assertEquals(1, processTable.size());
+        assertTrue(processTable.containsKey(testBlock.getHash()));
+
+        // abort the process
+        listener.abortMining(testBlock.getHash());
+
+        // cleanup
+        listener.scheduledProcessCleanup();
+
+        // ensure that the process got destroyed
+        assertEquals(0, processTable.size());
+    }
+
+
+    @Test
+    @DisplayName("Test that block mining works as intended")
+    public void testBlockMining() throws Exception {
+        Block testBlock = buildTestBlock();
+        final long zeroBits = 20;
+        final int threadCount = Runtime.getRuntime().availableProcessors();
+
+        given(blockchainMiningConfig.getMinedBlockZeroBitCount())
+                .willReturn(zeroBits);
+        given(blockchainMiningConfig.getThreadCount())
+                .willReturn(threadCount);
+
+        MinerEventListener listener = new MinerEventListener(
+                asymmetricCryptographyService,
+                applicationEventPublisher,
+                blockchainMiningConfig);
+
+        MineBlockEvent event = new MineBlockEvent(this, testBlock, BigInteger.ZERO, BigInteger.ONE);
+        listener.onApplicationEvent(event);
+        Map<String, MinerProcess> processes = listener.getMinerProcesses();
+
+        for (MinerProcess process : processes.values()) {
+            for (Thread thread : process.getThreads())
+                thread.join();
+        }
 
         // ensure that there is only one event for given block
         assertEquals(1, testEventListener.getEvents().size());
