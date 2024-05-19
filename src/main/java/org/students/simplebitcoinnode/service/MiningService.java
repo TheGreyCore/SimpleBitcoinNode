@@ -7,6 +7,7 @@ import org.students.simplebitcoinnode.config.BlockchainMiningConfig;
 import org.students.simplebitcoinnode.config.BlockchainMiningPoolConfig;
 import org.students.simplebitcoinnode.dto.BlockIntroductionDTO;
 import org.students.simplebitcoinnode.dto.DistributedMiningRequestDTO;
+import org.students.simplebitcoinnode.dto.PoolInitiationBlockMetadataDTO;
 import org.students.simplebitcoinnode.dto.PoolMiningProposalDTO;
 import org.students.simplebitcoinnode.entity.AdjacentNode;
 import org.students.simplebitcoinnode.entity.Block;
@@ -54,5 +55,9 @@ public class MiningService {
 
         // Save new block to the database
         blockRepository.save(dtoMapperWrapper.unmap(proposalDTO.getBlock(), Block.class));
+    }
+
+    public void initiate(PoolInitiationBlockMetadataDTO poolInitiationBlockMetadataDTO) {
+        return;
     }
 }
