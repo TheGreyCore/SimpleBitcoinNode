@@ -32,5 +32,3 @@ public class MiningController {
             return ResponseEntity.badRequest().body(illegalArgumentException);
         }
         return ResponseEntity.ok().body("New propose saved.");
-    }
-}
