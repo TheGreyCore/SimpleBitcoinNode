@@ -25,10 +25,12 @@ public class MiningController {
      * @return ResponseEntity with a message indicating the result of the operation.
      */
     @PostMapping("/propose")
-    public ResponseEntity<?> propose (@RequestBody PoolMiningProposalDTO proposalDTO){
+    public ResponseEntity<?> propose(@RequestBody PoolMiningProposalDTO proposalDTO) {
         try {
             miningService.propose(proposalDTO);
-        } catch (IllegalArgumentException illegalArgumentException){
+        } catch (IllegalArgumentException illegalArgumentException) {
             return ResponseEntity.badRequest().body(illegalArgumentException);
         }
         return ResponseEntity.ok().body("New propose saved.");
+    }
+}
