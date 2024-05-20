@@ -140,6 +140,6 @@ public class MinerEventListenerTests {
                 ((calculatedHash[2] & 0xFFL) << 16) |
                 ((calculatedHash[1] & 0xFFL) << 8) |
                 ((calculatedHash[0] & 0xFFL));
-        assertEquals(0, prefixVal & ((1L << zeroBits)));
+        assertEquals(0, prefixVal & ((1L << zeroBits) - 1));
     }
 }

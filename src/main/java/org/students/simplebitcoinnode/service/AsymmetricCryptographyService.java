@@ -6,6 +6,7 @@ import org.students.simplebitcoinnode.exceptions.crypto.MalformedSignatureExcept
 import org.students.simplebitcoinnode.exceptions.encoding.SerializationException;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.util.logging.Logger;
 
@@ -63,6 +64,9 @@ public abstract class AsymmetricCryptographyService {
      * @return serialized object's byte array
      */
     protected byte[] byteSerialize(Serializable serializable) throws SerializationException {
+        if (serializable instanceof String)
+            return ((String)serializable).getBytes(StandardCharsets.UTF_8);
+
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
              ObjectOutputStream out = new ObjectOutputStream(byteArrayOutputStream))
         {
