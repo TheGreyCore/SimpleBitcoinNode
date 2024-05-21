@@ -68,11 +68,6 @@ public class MiningService {
         // Get block for initiating
         Block initiateBlock = blockRepository.findBlockHeaderByHash(poolInitiationBlockMetadataDTO.getHash()).orElse(null);
 
-        // Check that data are correctly provided.
-        if (initiateBlock == null) throw new IllegalArgumentException("Block of hash was not wound!");
-        if (poolInitiationBlockMetadataDTO.getMiners().isEmpty())
-            throw new IllegalArgumentException("Miners cannot be 0.");
-
         // Get list of miners publicKeys and modify block
         List<MinerPublicKey> minerPublicKeyList = new ArrayList<>();
         for (String minerString : poolInitiationBlockMetadataDTO.getMiners()) {
@@ -80,6 +75,8 @@ public class MiningService {
             minerPublicKey.setPubKey(minerString);
             minerPublicKeyList.add(minerPublicKey);
         }
+
+        assert initiateBlock != null;
         initiateBlock.setMiners(minerPublicKeyList);
 
         // Publish new MineBlockEvent
