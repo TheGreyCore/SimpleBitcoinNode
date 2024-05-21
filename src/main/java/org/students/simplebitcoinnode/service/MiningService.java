@@ -21,16 +21,12 @@ import java.util.logging.Logger;
 public class MiningService {
     Logger logger = Logger.getLogger(NodeRegistrationService.class.getName());
     private final DTOMapperWrapper dtoMapperWrapper;
-    private final AdjacentNodeRepository adjacentNodeRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
-    private final BlockchainMiningPoolConfig blockchainMiningPoolConfig;
     private final BlockRepository blockRepository;
 
-    public MiningService(DTOMapperWrapper dtoMapperWrapper, AdjacentNodeRepository adjacentNodeRepository, ApplicationEventPublisher applicationEventPublisher, BlockchainMiningPoolConfig blockchainMiningPoolConfig, BlockRepository blockRepository) {
+    public MiningService(DTOMapperWrapper dtoMapperWrapper, ApplicationEventPublisher applicationEventPublisher, BlockRepository blockRepository) {
         this.dtoMapperWrapper = dtoMapperWrapper;
-        this.adjacentNodeRepository = adjacentNodeRepository;
         this.applicationEventPublisher = applicationEventPublisher;
-        this.blockchainMiningPoolConfig = blockchainMiningPoolConfig;
         this.blockRepository = blockRepository;
     }
 
