@@ -1,5 +1,6 @@
 package org.students.simplebitcoinnode.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,13 +28,13 @@ public class MiningController {
      * @return ResponseEntity with a message indicating the result of the operation.
      */
     @PostMapping("/propose")
-    public ResponseEntity<?> propose(@RequestBody PoolMiningProposalDTO proposalDTO) {
+    public ResponseEntity<?> propose(@Valid @RequestBody PoolMiningProposalDTO proposalDTO) {
         try {
             miningService.propose(proposalDTO);
         } catch (IllegalArgumentException illegalArgumentException) {
             return ResponseEntity.badRequest().body(illegalArgumentException);
         }
-        return ResponseEntity.ok().body("New propose saved.");
+        return ResponseEntity.ok().build();
     }
 
     /**
