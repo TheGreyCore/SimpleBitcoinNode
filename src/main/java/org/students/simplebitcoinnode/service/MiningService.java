@@ -41,18 +41,6 @@ public class MiningService {
      * @throws IllegalArgumentException If the expected pool size is larger than the allowed size or if the previous block hash does not represent a block with the longest chain.
      */
     public void propose(PoolMiningProposalDTO proposalDTO) {
-        // Check that amount of expected pool size is lower than allowed one.
-        Integer maximumPoolRequestsSize = blockchainMiningPoolConfig.getMaximumPoolRequests();
-        Integer expectedPoolSize = proposalDTO.getExpectedPoolSize();
-        if (maximumPoolRequestsSize < expectedPoolSize)
-            throw new IllegalArgumentException("Expected pool size is bigger than allowed size. Allowed size is: " + maximumPoolRequestsSize);
-
-        // Check that the previous block hash represents a block with the longest chain.
-        String blockWithLongestChainHash = blockRepository.findBlockWithLongestChain().getHash();
-        String previousBlockHash = proposalDTO.getBlock().getPreviousHash();
-        if (!previousBlockHash.equals(blockWithLongestChainHash))
-            throw new IllegalArgumentException("Passed previous block has is invalid!");
-
         // Save new block to the database
         blockRepository.save(dtoMapperWrapper.unmap(proposalDTO.getBlock(), Block.class));
     }
