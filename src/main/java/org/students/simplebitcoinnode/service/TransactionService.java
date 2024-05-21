@@ -2,7 +2,10 @@ package org.students.simplebitcoinnode.service;
 
 import org.springframework.stereotype.Service;
 import org.students.simplebitcoinnode.dto.TransactionDTO;
+import org.students.simplebitcoinnode.dto.TransactionOutputDTO;
 import org.students.simplebitcoinnode.entity.Transaction;
+import org.students.simplebitcoinnode.entity.TransactionOutput;
+import org.students.simplebitcoinnode.repository.TransactionOutputRepository;
 import org.students.simplebitcoinnode.repository.TransactionRepository;
 import org.students.simplebitcoinnode.util.DTOMapperWrapper;
 
@@ -11,10 +14,12 @@ import java.util.List;
 @Service
 public class TransactionService {
     private final TransactionRepository transactionRepository;
+    private final TransactionOutputRepository transactionOutputRepository;
     private final DTOMapperWrapper dtoMapperWrapper;
 
-    public TransactionService(TransactionRepository transactionRepository, DTOMapperWrapper dtoMapperWrapper) {
+    public TransactionService(TransactionRepository transactionRepository, TransactionOutputRepository transactionOutputRepository, DTOMapperWrapper dtoMapperWrapper) {
         this.transactionRepository = transactionRepository;
+        this.transactionOutputRepository = transactionOutputRepository;
         this.dtoMapperWrapper = dtoMapperWrapper;
     }
 
@@ -44,6 +49,11 @@ public class TransactionService {
                 yield dtoMapperWrapper.mapAll(transactions, TransactionDTO.class);
             default: yield null;
         };
+    }
+
+    public List<TransactionOutputDTO> getUnspentTransactionOutputs(String pubKey) {
+        List<TransactionOutput> transactionOutputs = transactionOutputRepository.findUTXOsByReceiverPublicKey(pubKey);
+        return dtoMapperWrapper.mapAll(transactionOutputs, TransactionOutputDTO.class);
     }
 
 

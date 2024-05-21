@@ -33,6 +33,6 @@ public interface TransactionOutputRepository extends JpaRepository<TransactionOu
      * @param receiverPublicKey specifies the receiver's public key to use for querying
      * @return a list of all unspent transaction outputs belonging to given wallet
      */
-    @Query(value = "SELECT * FROM TRANSACTION_OUTPUT t WHERE t.receiverPublicKey=?1 AND t.OUTPUT_ID=NULL", nativeQuery = true)
+    @Query(value = "SELECT * FROM TRANSACTION_OUTPUT t WHERE t.RECEIVER_PUBLIC_KEY=?1 AND t.INPUT_ID IS NULL", nativeQuery = true)
     List<TransactionOutput> findUTXOsByReceiverPublicKey(String receiverPublicKey);
 }
