@@ -18,7 +18,7 @@ public interface TransactionOutputRepository extends JpaRepository<TransactionOu
      * @param signature specifies the signature to use for searching
      * @return an integer value of how many unspent transaction outputs were found
      */
-    @Query(value = "SELECT COUNT(*) FROM TRANSACTION_OUTPUT t WHERE t.signature=?1 AND t.OUTPUT_ID=NULL", nativeQuery = true)
+    @Query(value = "SELECT COUNT(*) FROM TRANSACTION_OUTPUT t WHERE t.SIGNATURE=?1 AND t.INPUT_ID IS NULL", nativeQuery = true)
     int findUtxoCountBySignature(String signature);
 
     /**
