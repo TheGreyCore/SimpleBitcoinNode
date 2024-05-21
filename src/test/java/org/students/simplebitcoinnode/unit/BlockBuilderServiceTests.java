@@ -78,9 +78,9 @@ public class BlockBuilderServiceTests {
         assertEquals(previousBlockHash, block.getPreviousHash());
         assertEquals(BigInteger.ZERO, block.getNonce());
         assertNotNull(block.getBlockAssemblyTimestamp());
+        assertNotNull(block.getMiners());
         assertNull(block.getId());
         assertNull(block.getMinedTimestamp());
-        assertNull(block.getMiners());
         assertNotNull(block.getBlockAssemblyTimestamp());
     }
 

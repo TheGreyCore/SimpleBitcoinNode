@@ -10,7 +10,7 @@ import java.util.List;
 
 @Component
 @Getter
-public class TestEventListener {
+public class BlockMinedEventTestListener {
     private final List<BlockMinedEvent> events = new ArrayList<>();
 
     @EventListener

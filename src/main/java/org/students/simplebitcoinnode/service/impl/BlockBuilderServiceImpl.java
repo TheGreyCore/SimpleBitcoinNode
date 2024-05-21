@@ -60,6 +60,7 @@ public class BlockBuilderServiceImpl implements BlockBuilderService {
         block.setPreviousHash(previousBlockHash);
         block.setNonce(BigInteger.ZERO);
         block.setMerkleTree(root);
+        block.setMiners(new ArrayList<>());
         block.setHash(Encoding.toHexString(asymmetricCryptographyService.digestObject(block)));
         return block;
     }

@@ -34,13 +34,13 @@ public class MinerEventListenerTests {
     // injected dependencies
     private final AsymmetricCryptographyService asymmetricCryptographyService;
     private final ApplicationEventPublisher applicationEventPublisher;
-    private final TestEventListener testEventListener;
+    private final BlockMinedEventTestListener testEventListener;
 
     @Mock
     private BlockchainMiningConfig blockchainMiningConfig;
 
     @Autowired
-    public MinerEventListenerTests(AsymmetricCryptographyService asymmetricCryptographyService, ApplicationEventPublisher applicationEventPublisher, TestEventListener testEventListener) {
+    public MinerEventListenerTests(AsymmetricCryptographyService asymmetricCryptographyService, ApplicationEventPublisher applicationEventPublisher, BlockMinedEventTestListener testEventListener) {
         this.asymmetricCryptographyService = asymmetricCryptographyService;
         this.applicationEventPublisher = applicationEventPublisher;
         this.testEventListener = testEventListener;
