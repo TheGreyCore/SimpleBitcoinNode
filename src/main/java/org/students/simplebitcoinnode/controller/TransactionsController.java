@@ -40,6 +40,17 @@ public class TransactionsController {
     }
 
     /**
+     * A controller method mapped to "/utxo" endpoint
+     * It retrieves a list of transaction outputs that are unspent
+     * @param pubKey receiver public key to use for querying
+     * @return a list of transaction outputs that are unspent
+     */
+    @GetMapping("/utxo")
+    public ResponseEntity<?> getUnspentTransactionOutputs(@RequestParam String pubKey) {
+        return ResponseEntity.ok().body(transactionService.getUnspentTransactionOutputs(pubKey));
+    }
+
+    /**
      * This method is used to create new transactions.
      *
      * @param newTransactionDTO This is the transaction to be created.

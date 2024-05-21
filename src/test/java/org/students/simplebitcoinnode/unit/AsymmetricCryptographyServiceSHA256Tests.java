@@ -14,10 +14,10 @@ public abstract class AsymmetricCryptographyServiceSHA256Tests extends Asymmetri
     public void testDigest_EnsureMatchingSHA256Digest_SerializableString() {
         final String[] msgs = {"Hello world!", "hello world!", "Yoooooo!", "Hash me pls"};
         final String[] hashes = {
-            "c8af75eb8aea98fc3dd2737404a7ed9e3a57c7f597ad56af9f342a1e66c48212",
-            "8c5798e47b0160f79040b678184e40bb57419d5d954a41bee48975b0e0e4e520",
-            "1de205d4dabd597a8464e4199bc948a29585532ee090477598815100d4dc2a80",
-            "b9e5c80e5cfa91c4023416708c752425b0866cfd3a238293e3276db69c7a74eb"
+            "c0535e4be2b79ffd93291305436bf889314e4a3faec05ecffcbb7df31ad9e51a",
+            "7509e5bda0c762d2bac7f90d758b5b2263fa01ccbc542ab5e3df163be08e6ca9",
+            "d347889a452c32b2a3c347784562ab9841b780a648e2f2f1d90f232d4ceda59b",
+            "119b8980fa09350d10828b07ab92e48adc9f34ceb350d01e6dc75b64d0c1a48e"
         };
 
         try {

@@ -27,7 +27,7 @@ public class BlockBuilderServiceImpl implements BlockBuilderService {
     }
 
     @Override
-    public MerkleTreeNode calculateMerkleTreeRoot(Collection<Transaction> transactions) throws InvalidEncodedStringException {
+    public MerkleTreeNode createMerkleTreeRoot(Collection<Transaction> transactions) throws InvalidEncodedStringException {
         Queue<MerkleTreeNode> treeQueue = new ArrayDeque<>();
         for (Transaction transaction : transactions)
             treeQueue.add(MerkleTreeNode.builder().hash(transaction.getTransactionHash()).transaction(transaction).build());
@@ -55,11 +55,13 @@ public class BlockBuilderServiceImpl implements BlockBuilderService {
     }
 
     @Override
-    public Block newBlock(MerkleTreeNode root, String previousBlockHash) {
+    public Block newBlock(MerkleTreeNode root, String previousBlockHash) throws SerializationException {
         Block block = new Block();
         block.setPreviousHash(previousBlockHash);
         block.setNonce(BigInteger.ZERO);
         block.setMerkleTree(root);
+        block.setMiners(new ArrayList<>());
+        block.setHash(Encoding.toHexString(asymmetricCryptographyService.digestObject(block)));
         return block;
     }
 
@@ -71,14 +73,12 @@ public class BlockBuilderServiceImpl implements BlockBuilderService {
         List<TransactionOutput> outputs = new ArrayList<>(recipientWalletAddresses.size());
         BigDecimal rewardsPerWallet = blockReward.divide(new BigDecimal(recipientWalletAddresses.size()), 8, RoundingMode.HALF_DOWN);
 
-        int i = 0;
         for (String recipientWalletAddress : recipientWalletAddresses) {
-            outputs.set(i, TransactionOutput.builder()
+            outputs.add(TransactionOutput.builder()
                     .amount(rewardsPerWallet)
                     .receiverPublicKey(recipientWalletAddress)
                     .signature("0".repeat(144))
                     .build());
-            i++;
         }
 
         transaction.setOutputs(outputs);

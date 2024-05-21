@@ -11,18 +11,18 @@ import java.util.Collection;
 
 public interface BlockBuilderService {
     /**
-     * Calculate merkle tree root SHA256 hash of given transactions
+     * Creates a merkle tree root node from a collection of transactions
      * @param transactions specifies collection list of transactions to use for hashing
      * @return MerkleTreeNode object representing the merkle tree root
      */
-    MerkleTreeNode calculateMerkleTreeRoot(Collection<Transaction> transactions) throws InvalidEncodedStringException;
+    MerkleTreeNode createMerkleTreeRoot(Collection<Transaction> transactions) throws InvalidEncodedStringException;
 
     /**
-     * Create a new block from given transactions
-     * @param merkleTreeNode specifies Merkle tree root node to use in the new block
+     * Create a new block from given merkle tree root and previous block hash
+     * @param merkleTreeRoot specifies Merkle tree root node to use in the new block
      * @return Block object representing the built block
      */
-    Block newBlock(MerkleTreeNode merkleTreeNode, String previousBlockHash);
+    Block newBlock(MerkleTreeNode merkleTreeRoot, String previousBlockHash) throws SerializationException;
 
     /**
      * Build a coinbase transaction from a list of recipient addresses, who shall receive the mining rewards

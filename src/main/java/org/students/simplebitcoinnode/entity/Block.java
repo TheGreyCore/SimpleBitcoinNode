@@ -20,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Block implements Externalizable {
+public class Block implements Externalizable, Cloneable {
     @Serial
     private static final long serialVersionUID = 0x010000L;
 
@@ -60,12 +60,17 @@ public class Block implements Externalizable {
     private String hash;
 
     @Override
+    public Object clone() {
+        return new Block(id, previousHash, merkleTree, miners, blockAssemblyTimestamp, minedTimestamp, nonce, hash);
+    }
+
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         try {
             out.write(Encoding.hexStringToBytes(previousHash));
             out.write(Encoding.hexStringToBytes(merkleTree.getHash()));
             for (MinerPublicKey miner : miners)
-                out.write(Encoding.hexStringToBytes(miner.getPubKey()));
+                out.write(Encoding.defaultPubKeyDecoding(miner.getPubKey()));
             out.writeObject(blockAssemblyTimestamp);
             out.write(nonce.toByteArray());
         }

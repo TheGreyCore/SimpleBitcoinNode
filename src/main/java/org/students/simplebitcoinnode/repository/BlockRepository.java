@@ -78,6 +78,7 @@ public interface BlockRepository extends JpaRepository<Block, Long> {
             SELECT b.PREVIOUS_HASH, b.HASH, s.CHAIN_LENGTH + 1 AS CHAIN_LENGTH
             FROM BLOCKS b
             JOIN SEARCH_LONGEST s ON s.HASH = b.PREVIOUS_HASH
+            WHERE SUBSTR(b.HASH, 0, 10) = '0000000000'
         )
         SELECT TOP 1 * FROM BLOCKS
         WHERE HASH = (SELECT TOP 1 HASH FROM SEARCH_LONGEST ORDER BY CHAIN_LENGTH DESC)
