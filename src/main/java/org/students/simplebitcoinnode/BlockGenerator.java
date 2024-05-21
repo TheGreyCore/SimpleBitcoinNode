@@ -35,7 +35,7 @@ public class BlockGenerator implements CommandLineRunner {
     private final List<MerkleTreeNode> merkleTreeRootNodes = new ArrayList<>();
     private final List<Block> blocks = new ArrayList<>();
 
-    Logger logger = Logger.getLogger(BlockGenerator.class.getName());
+    private final Logger logger = Logger.getLogger(BlockGenerator.class.getName());
 
     public BlockGenerator(BlockRepository blockRepository,
                           MerkleTreeNodeRepository merkleTreeNodeRepository,
