@@ -13,6 +13,7 @@ import java.io.ObjectOutput;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,7 +70,8 @@ public class Transaction implements Externalizable {
                 out.write(Encoding.defaultPubKeyDecoding(output.getReceiverPublicKey()));
             }
             out.write(Encoding.defaultPubKeyDecoding(senderPublicKey));
-            out.writeObject(timestamp);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss");
+            out.writeUTF(timestamp.format(formatter));
         }
         catch (InvalidEncodedStringException e) {
             throw new IOException(e.getMessage());

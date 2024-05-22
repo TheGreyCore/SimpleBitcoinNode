@@ -11,6 +11,7 @@ import java.io.*;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Entity
@@ -41,7 +42,7 @@ public class Block implements Externalizable, Cloneable {
     @JoinColumn(name = "merkle_tree_root", referencedColumnName = "id")
     private MerkleTreeNode merkleTree;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "block_id")
     private List<MinerPublicKey> miners;
 
@@ -71,7 +72,8 @@ public class Block implements Externalizable, Cloneable {
             out.write(Encoding.hexStringToBytes(merkleTree.getHash()));
             for (MinerPublicKey miner : miners)
                 out.write(Encoding.defaultPubKeyDecoding(miner.getPubKey()));
-            out.writeObject(blockAssemblyTimestamp);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss");
+            out.writeUTF(blockAssemblyTimestamp.format(formatter));
             out.write(nonce.toByteArray());
         }
         catch (InvalidEncodedStringException e) {
