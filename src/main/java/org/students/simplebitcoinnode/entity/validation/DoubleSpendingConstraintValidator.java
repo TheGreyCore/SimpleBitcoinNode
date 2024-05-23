@@ -35,7 +35,7 @@ public class DoubleSpendingConstraintValidator implements ConstraintValidator<Do
 
         // for each input check if it is a valid
         for (TransactionOutputDTO utxoCandidate : transaction.getInputs()) {
-            if (transactionOutputRepository.findUtxoCountBySignature(utxoCandidate.getSignature()) > 0) {
+            if (transactionOutputRepository.findUtxoCountBySignature(utxoCandidate.getSignature()) < 1) {
                 logger.info("Transaction output with signature '" + utxoCandidate.getSignature() + "' is not a valid UTXO, validation failed!");
                 return false;
             }

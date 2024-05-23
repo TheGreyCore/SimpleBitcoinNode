@@ -52,7 +52,7 @@ public class GenesisBlockMaker implements CommandLineRunner {
                             .inputs(new ArrayList<>())
                             .outputs(List.of(
                                 TransactionOutput.builder()
-                                        .signature("")
+                                        .signature("0".repeat(144))
                                         .amount(BigDecimal.valueOf(50))
                                         .receiverPublicKey("PZ8Tyr4Nx8MHsRAGMpZmZ6TWY63dXWSCzGyThs339cjyNikASTvfrCEiY2nWjUis5PUCyF24R4nLYR8RYmkwGQ2ZAoH1L45RADpkSWZ7S6i7dKkDkgHkYVsB")
                                         .build()
@@ -64,6 +64,8 @@ public class GenesisBlockMaker implements CommandLineRunner {
             transactionRepository.save(coinbase);
             blockRepository.save(block);
         }
+
+        System.exit(0);
     }
 
     public static void main(String[] args) {

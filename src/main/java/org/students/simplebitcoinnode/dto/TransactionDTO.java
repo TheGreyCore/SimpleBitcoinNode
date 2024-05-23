@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,12 +39,19 @@ public class TransactionDTO implements Externalizable {
     public void writeExternal(ObjectOutput out) throws IOException {
         try {
             out.writeInt(inputs.size());
-            for (TransactionOutputDTO input : inputs)
-                out.writeObject(input);
+            for (TransactionOutputDTO input : inputs) {
+                out.write(Encoding.hexStringToBytes(input.getSignature()));
+                out.writeUTF(input.getAmount().toString());
+                out.write(Encoding.defaultPubKeyDecoding(input.getReceiverPublicKey()));
+            }
             out.writeInt(outputs.size());
-            for (TransactionOutputDTO output : outputs)
-                out.writeObject(output);
+            for (TransactionOutputDTO output : outputs) {
+                out.writeUTF(output.getAmount().toString());
+                out.write(Encoding.defaultPubKeyDecoding(output.getReceiverPublicKey()));
+            }
             out.write(Encoding.defaultPubKeyDecoding(senderPublicKey));
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss");
+            out.writeUTF(timestamp.format(formatter));
         }
         catch (InvalidEncodedStringException e) {
             throw new IOException(e);

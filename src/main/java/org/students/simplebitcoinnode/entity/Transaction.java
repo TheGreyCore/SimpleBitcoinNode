@@ -61,12 +61,12 @@ public class Transaction implements Externalizable {
             out.writeInt(inputs.size());
             for (TransactionOutput input : inputs) {
                 out.write(Encoding.hexStringToBytes(input.getSignature()));
-                out.writeObject(input.getAmount());
+                out.writeUTF(input.getAmount().toString());
                 out.write(Encoding.defaultPubKeyDecoding(input.getReceiverPublicKey()));
             }
             out.writeInt(outputs.size());
             for (TransactionOutput output : outputs) {
-                out.writeObject(output.getAmount());
+                out.writeUTF(output.getAmount().toString());
                 out.write(Encoding.defaultPubKeyDecoding(output.getReceiverPublicKey()));
             }
             out.write(Encoding.defaultPubKeyDecoding(senderPublicKey));

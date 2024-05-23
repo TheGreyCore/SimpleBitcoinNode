@@ -2,13 +2,11 @@ package org.students.simplebitcoinnode.service;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import org.students.simplebitcoinnode.config.BlockchainMiningPoolConfig;
 import org.students.simplebitcoinnode.dto.PoolInitiationBlockMetadataDTO;
 import org.students.simplebitcoinnode.dto.PoolMiningProposalDTO;
 import org.students.simplebitcoinnode.entity.Block;
 import org.students.simplebitcoinnode.entity.MinerPublicKey;
 import org.students.simplebitcoinnode.event.MineBlockEvent;
-import org.students.simplebitcoinnode.repository.AdjacentNodeRepository;
 import org.students.simplebitcoinnode.repository.BlockRepository;
 import org.students.simplebitcoinnode.util.DTOMapperWrapper;
 

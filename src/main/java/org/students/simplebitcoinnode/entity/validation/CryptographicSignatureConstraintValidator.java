@@ -48,9 +48,11 @@ public class CryptographicSignatureConstraintValidator implements ConstraintVali
                     return false;
 
                 // concatenate the transaction hash and output's receiver public key to get signature message
-                byte[] sigMessage = new byte[120];
-                System.arraycopy(asymmetricCryptographyService.digestObject(transaction), 0, sigMessage, 0, 32);
-                System.arraycopy(Encoding.defaultPubKeyDecoding(transactionOutput.getReceiverPublicKey()), 0, sigMessage, 32, 88);
+                byte[] hash = asymmetricCryptographyService.digestObject(transaction);
+                byte[] decodedPublicKey = Encoding.defaultPubKeyDecoding(transactionOutput.getReceiverPublicKey());
+                byte[] sigMessage = new byte[hash.length + decodedPublicKey.length];
+                System.arraycopy(hash, 0, sigMessage, 0, hash.length);
+                System.arraycopy(decodedPublicKey, 0, sigMessage, hash.length, decodedPublicKey.length);
                 if (!asymmetricCryptographyService.verifyDigitalSignature(sigMessage, Encoding.hexStringToBytes(transactionOutput.getSignature()), Encoding.defaultPubKeyDecoding(transaction.getSenderPublicKey())))
                     return false;
             }
