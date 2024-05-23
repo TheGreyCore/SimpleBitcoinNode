@@ -74,7 +74,7 @@ public class TransactionValidationTests {
 
         // mock findUtxoCountBySignature(), presumably used in DoubleSpendingConstraint
         given(transactionOutputRepository.findUtxoCountBySignature(anyString()))
-                .willReturn(0);
+                .willReturn(1);
 
         for (TransactionOutputDTO input : transaction.getInputs()) {
             given(transactionOutputRepository.findTransactionOutputBySignature(input.getSignature()))
@@ -177,7 +177,7 @@ public class TransactionValidationTests {
 
         // mock findUtxoCountBySignature(), presumably used in DoubleSpendingConstraint
         given(transactionOutputRepository.findUtxoCountBySignature(any()))
-            .willReturn(1);
+            .willReturn(0);
 
         DoubleSpendingConstraintValidator doubleSpendingConstraintValidator = new DoubleSpendingConstraintValidator(transactionOutputRepository);
         assertFalse(doubleSpendingConstraintValidator.isValid(transaction, null));
